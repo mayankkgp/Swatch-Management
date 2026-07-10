@@ -1,0 +1,6 @@
+{
+  "name": "Swatch Logging Interface",
+  "description": "Foundational responsive routing shell and master application frame for swatch logging, gallery imports, and batch printing.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
