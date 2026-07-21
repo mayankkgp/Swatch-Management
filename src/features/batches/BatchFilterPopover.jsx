@@ -67,7 +67,7 @@ export default function BatchFilterPopover({
       className="absolute right-0 top-full mt-1.5 w-64 bg-white border border-slate-200 rounded-md shadow-lg z-50 text-slate-800 flex flex-col font-sans"
     >
       {/* Popover Header */}
-      <div className="flex items-center justify-between border-b border-slate-200 px-3 py-2 shrink-0">
+      <div className="flex items-center justify-between border-b border-slate-200 px-3 h-9 shrink-0">
         <span className="text-xs font-bold text-slate-700">Filters</span>
         {(selectedVendors.length > 0 || fromDate || toDate || filterMinSwatches !== 'all' || (filterMonth && filterMonth !== 'all')) && (
           <button

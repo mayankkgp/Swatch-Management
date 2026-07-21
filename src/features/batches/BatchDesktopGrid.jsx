@@ -256,7 +256,7 @@ export default function BatchDesktopGrid({
               className="h-6 px-2 rounded-sm border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-45 disabled:hover:bg-white transition-colors flex items-center gap-1 text-[11px] font-semibold cursor-pointer"
             >
               <ChevronLeft className="size-3" />
-              <span>Previous</span>
+              <span>Prev</span>
             </Button>
             
             {/* Page number buttons */}

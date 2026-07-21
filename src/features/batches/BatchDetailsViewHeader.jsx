@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { X, Edit2, Check, Printer } from 'lucide-react';
+import { X, Edit2, Check, Printer, CheckSquare, Square } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 
@@ -26,8 +26,20 @@ export default function BatchDetailsViewHeader({
   setSelectedSwatchIds,
   handlePrint,
   isPrinting,
-  onClose
+  onClose,
+  resolvedSwatches = [],
+  selectedSwatchIds = []
 }) {
+  const isAllSelected = resolvedSwatches.length > 0 && selectedSwatchIds.length === resolvedSwatches.length;
+
+  const handleToggleAll = () => {
+    if (isAllSelected) {
+      setSelectedSwatchIds([]);
+    } else {
+      setSelectedSwatchIds(resolvedSwatches.map(s => s.id));
+    }
+  };
+
   return (
     <div className="sticky top-0 md:relative z-30 bg-white border-b border-slate-200 p-3 flex items-center justify-between shadow-xs md:h-10 md:py-0 shrink-0">
       <div className="flex items-center gap-1.5 min-w-0">
@@ -99,22 +111,53 @@ export default function BatchDetailsViewHeader({
       <div className="flex items-center shrink-0">
         {!viewingSwatchId && !editingSwatchId && (
           <>
-            <div className="hidden md:block">
-              <Button
-                onClick={() => {
-                  setIsBulkEditMode(p => !p);
-                  setSelectedSwatchIds([]);
-                }}
-                className={`md:h-6 text-sm md:text-xs md:px-2.5 rounded-md md:rounded-sm border font-semibold transition-all flex items-center justify-center gap-2 md:gap-1 shadow-xs shrink-0 py-1 px-1 md:py-0 ${
-                  isBulkEditMode 
-                    ? 'bg-slate-900 text-white border-slate-900' 
-                    : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
-                }`}
-              >
-                <Edit2 className="size-4 md:size-3" />
-                <span>{isBulkEditMode ? 'Cancel' : 'Edit Bulk'}</span>
-              </Button>
-            </div>
+            {isBulkEditMode ? (
+              <>
+                <div className="hidden md:block">
+                  <Button
+                    onClick={handleToggleAll}
+                    className={`h-6 text-xs rounded-sm border transition-colors flex items-center justify-center gap-1.5 font-medium cursor-pointer py-0 px-2 whitespace-nowrap ${
+                      isAllSelected
+                        ? 'bg-slate-900 text-white border-slate-900' 
+                        : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200 shadow-2xs'
+                    }`}
+                  >
+                    {isAllSelected ? (
+                      <CheckSquare className="size-3.5 shrink-0" strokeWidth={2} />
+                    ) : (
+                      <Square className="size-3.5 shrink-0" strokeWidth={2} />
+                    )}
+                    <span>{isAllSelected ? 'Unselect all' : 'Select all'}</span>
+                  </Button>
+                </div>
+                <div className="hidden md:block w-1.5 md:w-2" />
+                <div className="hidden md:block">
+                  <Button
+                    onClick={() => {
+                      setIsBulkEditMode(false);
+                      setSelectedSwatchIds([]);
+                    }}
+                    className="md:h-6 text-sm md:text-xs md:px-2.5 rounded-md md:rounded-sm border font-semibold transition-all flex items-center justify-center gap-2 md:gap-1 shadow-xs shrink-0 py-1 px-1 md:py-0 bg-slate-900 text-white border-slate-900"
+                  >
+                    <Edit2 className="size-4 md:size-3" />
+                    <span>Cancel</span>
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <div className="hidden md:block">
+                <Button
+                  onClick={() => {
+                    setIsBulkEditMode(true);
+                    setSelectedSwatchIds([]);
+                  }}
+                  className="md:h-6 text-sm md:text-xs md:px-2.5 rounded-md md:rounded-sm border font-semibold transition-all flex items-center justify-center gap-2 md:gap-1 shadow-xs shrink-0 py-1 px-1 md:py-0 bg-white hover:bg-slate-50 text-slate-700 border-slate-200"
+                >
+                  <Edit2 className="size-4 md:size-3" />
+                  <span>Edit Bulk</span>
+                </Button>
+              </div>
+            )}
    
             {!isBulkEditMode && (
               <>

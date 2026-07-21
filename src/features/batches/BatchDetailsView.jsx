@@ -154,6 +154,8 @@ export default function BatchDetailsView({
         handlePrint={handlePrint}
         isPrinting={isPrinting}
         onClose={onClose}
+        resolvedSwatches={resolvedSwatches}
+        selectedSwatchIds={selectedSwatchIds}
       />
 
       <div className="flex-1 flex flex-col md:flex-row overflow-y-visible md:overflow-hidden min-h-0 relative">

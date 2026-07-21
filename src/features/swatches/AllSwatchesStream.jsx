@@ -195,30 +195,32 @@ export default function AllSwatchesStream({
         />
 
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-slate-50">
-          <AllSwatchesStreamHeader
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            showFilterBar={showFilterBar}
-            setShowFilterBar={setShowFilterBar}
-            showSortBar={showSortBar}
-            setShowSortBar={setShowSortBar}
-            structureFilter={structureFilter}
-            setStructureFilter={setStructureFilter}
-            sortField={sortField}
-            editingSwatchId={editingSwatchId}
-            onNavigate={onNavigate}
-            isBulkEditMode={isBulkEditMode}
-            setIsBulkEditMode={setIsBulkEditMode}
-            setSelectedSwatchIds={setSelectedSwatchIds}
-            selectedSwatchIds={selectedSwatchIds}
-            selectedVendors={selectedVendors}
-            setSelectedVendors={setSelectedVendors}
-            fromDate={fromDate}
-            setFromDate={setFromDate}
-            toDate={toDate}
-            setToDate={setToDate}
-            resetFilters={resetFilters}
-          />
+          {!(isMobile && (isBulkEditMode || isEditingAnySwatchOnMobile)) && (
+            <AllSwatchesStreamHeader
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              showFilterBar={showFilterBar}
+              setShowFilterBar={setShowFilterBar}
+              showSortBar={showSortBar}
+              setShowSortBar={setShowSortBar}
+              structureFilter={structureFilter}
+              setStructureFilter={setStructureFilter}
+              sortField={sortField}
+              editingSwatchId={editingSwatchId}
+              onNavigate={onNavigate}
+              isBulkEditMode={isBulkEditMode}
+              setIsBulkEditMode={setIsBulkEditMode}
+              setSelectedSwatchIds={setSelectedSwatchIds}
+              selectedSwatchIds={selectedSwatchIds}
+              selectedVendors={selectedVendors}
+              setSelectedVendors={setSelectedVendors}
+              fromDate={fromDate}
+              setFromDate={setFromDate}
+              toDate={toDate}
+              setToDate={setToDate}
+              resetFilters={resetFilters}
+            />
+          )}
 
           <AllSwatchesMobileFilterDrawer
             isOpen={showFilterBar}

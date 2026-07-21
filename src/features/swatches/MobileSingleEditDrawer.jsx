@@ -99,7 +99,7 @@ export default function MobileSingleEditDrawer({
             </div>
           </div>
           <div className="col-span-2">
-            <label className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Material Content</label>
+            <label className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Content</label>
             <Input
               type="text"
               value={formData.content || ''}
@@ -109,7 +109,7 @@ export default function MobileSingleEditDrawer({
             />
           </div>
           <div className="col-span-2">
-            <label className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Weave Structure</label>
+            <label className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Structure</label>
             <select
               value={formData.structure || ''}
               onChange={(e) => handleInputChange('structure', e.target.value)}

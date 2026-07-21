@@ -12,6 +12,7 @@ import {
 } from '../../services/swatchServices';
 import BulkEditPanel from './BulkEditPanel';
 import BatchDirectoryListContainer from './BatchDirectoryListContainer';
+import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
 export default function BatchDirectory({ 
   batches = [], 
@@ -237,9 +238,19 @@ export default function BatchDirectory({
   };
 
   const getSortIcon = (field) => {
-    // Basic standard text arrow fallback
-    if (sortField !== field) return '↕';
-    return sortDirection === 'asc' ? '↑' : '↓';
+    if (sortField !== field) {
+      return (
+        <ArrowUpDown className="size-3 text-slate-400 group-hover:text-slate-600 transition-all ml-1 shrink-0" />
+      );
+    }
+    if (sortDirection === 'asc') {
+      return (
+        <ArrowUp className="size-3 text-indigo-600 font-bold ml-1 shrink-0 animate-in fade-in zoom-in-90 duration-150" />
+      );
+    }
+    return (
+      <ArrowDown className="size-3 text-indigo-600 font-bold ml-1 shrink-0 animate-in fade-in zoom-in-90 duration-150" />
+    );
   };
 
   const resetFilters = () => {

@@ -35,7 +35,7 @@ export default function SwatchCardDeleteOverlay({
                 onClick={triggerDelete}
                 className="h-10 px-4 bg-red-600 hover:bg-red-700 text-white font-bold text-sm rounded-md cursor-pointer shrink-0"
               >
-                Wipe Now
+                Delete
               </Button>
               <Button
                 type="button"

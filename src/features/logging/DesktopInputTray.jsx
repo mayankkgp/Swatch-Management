@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { ChevronDown, Sun, Moon } from 'lucide-react';
 import { VENDOR_NAMES, STRUCTURES } from '../../data/seedData';
 import SearchableSelect from '../../components/ui/SearchableSelect';
@@ -19,6 +19,20 @@ export default function DesktopInputTray({
   selectClass,
   inputClass
 }) {
+  const textareaRef = useRef(null);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    
+    textarea.style.height = 'auto';
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  }, [formData.content]);
+
+  const textareaClass = inputClass
+    .replace('md:h-8', 'md:min-h-[32px] md:max-h-[62px]')
+    .replace('md:py-0', 'md:py-1.5') + " resize-none overflow-y-auto";
+
   return (
     <div className="hidden md:flex md:w-[210px] flex-col bg-slate-50 relative border-r border-slate-200 overflow-y-auto shrink-0 select-none">
       <div className="py-3 px-1.5 space-y-3.5 flex-1 bg-transparent">
@@ -126,11 +140,12 @@ export default function DesktopInputTray({
           <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">
             Content
           </label>
-          <input
-            type="text"
+          <textarea
+            ref={textareaRef}
+            rows={1}
             value={formData.content || ''}
             onChange={(e) => handleInputChange('content', e.target.value)}
-            className={`${inputClass} md:[&::-webkit-outer-spin-button]:appearance-none md:[&::-webkit-inner-spin-button]:appearance-none md:[-moz-appearance:textfield]`}
+            className={textareaClass}
             placeholder="e.g. 100% Cotton"
           />
         </div>

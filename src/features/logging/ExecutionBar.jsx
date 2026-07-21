@@ -23,18 +23,18 @@ export default function ExecutionBar({
     <div className="flex-none h-12 md:h-auto bg-white md:bg-slate-50/50 border-t border-slate-200 px-4 md:px-4 py-1.5 md:pt-2 md:pb-1 flex items-center justify-between shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] md:shadow-none z-20 sticky bottom-0 md:text-xs md:text-slate-500 md:font-medium md:select-none">
       
       <div className="flex items-center gap-3">
-        <button 
+        <Button 
           type="button"
           onClick={onReviewClick}
           className="flex items-center justify-center gap-1.5 h-9 w-14 md:h-6 md:w-auto px-1 md:px-2.5 rounded-md md:rounded-sm border border-slate-200 hover:bg-slate-50 bg-white transition-colors text-slate-700 font-extrabold uppercase tracking-wider text-sm cursor-pointer md:normal-case md:tracking-normal md:font-semibold md:text-xs md:gap-1 md:shadow-xs md:py-0"
         >
           <ClipboardList className="size-5 md:hidden text-slate-600" />
-          <Layers className="hidden md:block size-3 text-slate-500" />
+          <Layers className="hidden md:block size-3" />
           <span className="hidden md:inline">Review</span>
-          <div className="bg-slate-900 text-white text-[10px] md:text-[9px] rounded-full min-w-5 h-5 md:min-w-4 md:h-4 px-1 flex items-center justify-center font-mono shadow-xs">
+          <div className="bg-slate-900 text-white text-[10px] md:text-[9px] rounded-full min-w-5 h-5 md:min-w-4 md:h-4 px-1 flex items-center justify-center font-mono md:font-sans md:font-semibold shadow-xs">
             {stagedCount}
           </div>
-        </button>
+        </Button>
         {queueCount > 0 && (
           <>
             <span className="hidden md:inline-block text-xs font-medium text-slate-500">

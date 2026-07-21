@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { X, ArrowLeft, Edit2 } from 'lucide-react';
+import { X, ArrowLeft, Edit2, CheckSquare, Square } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import BulkEditPanel from '../batches/BulkEditPanel';
 import BatchDetailsViewRenameModal from '../batches/BatchDetailsViewRenameModal';
@@ -82,18 +82,55 @@ export default function StagingQueueOverlay({
 
           <div className="flex items-center gap-2">
             {!state.viewingSwatchId && !state.editingSwatchId && (
-              <Button
-                onClick={() => {
-                  state.setIsBulkEditMode(p => !p);
-                  state.setSelectedSwatchIds([]);
-                }}
-                className={`hidden md:flex md:h-6 text-sm md:text-xs md:px-2.5 rounded-md md:rounded-sm border font-semibold transition-all items-center justify-center gap-2 md:gap-1 shadow-xs shrink-0 py-1 px-1 md:py-0 ${
-                  state.isBulkEditMode ? 'bg-slate-900 text-white border-slate-900' : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
-                }`}
-              >
-                <Edit2 className="size-4 md:size-3" />
-                <span>{state.isBulkEditMode ? 'Cancel' : 'Edit Bulk'}</span>
-              </Button>
+              <>
+                {state.isBulkEditMode ? (
+                  <>
+                    <Button
+                      onClick={() => {
+                        const isAllSel = state.reviewSwatches.length > 0 && state.selectedSwatchIds.length === state.reviewSwatches.length;
+                        if (isAllSel) {
+                          state.setSelectedSwatchIds([]);
+                        } else {
+                          state.setSelectedSwatchIds(state.reviewSwatches.map(s => s.id));
+                        }
+                      }}
+                      className={`hidden md:flex h-6 text-xs rounded-sm border transition-colors items-center justify-center gap-1.5 font-medium cursor-pointer py-0 px-2 whitespace-nowrap shrink-0 ${
+                        (state.reviewSwatches.length > 0 && state.selectedSwatchIds.length === state.reviewSwatches.length)
+                          ? 'bg-slate-900 text-white border-slate-900' 
+                          : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200 shadow-2xs'
+                      }`}
+                    >
+                      {(state.reviewSwatches.length > 0 && state.selectedSwatchIds.length === state.reviewSwatches.length) ? (
+                        <CheckSquare className="size-3.5 shrink-0" strokeWidth={2} />
+                      ) : (
+                        <Square className="size-3.5 shrink-0" strokeWidth={2} />
+                      )}
+                      <span>{(state.reviewSwatches.length > 0 && state.selectedSwatchIds.length === state.reviewSwatches.length) ? 'Unselect all' : 'Select all'}</span>
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        state.setIsBulkEditMode(false);
+                        state.setSelectedSwatchIds([]);
+                      }}
+                      className="hidden md:flex md:h-6 text-sm md:text-xs md:px-2.5 rounded-md md:rounded-sm border font-semibold transition-all items-center justify-center gap-2 md:gap-1 shadow-xs shrink-0 py-1 px-1 md:py-0 bg-slate-900 text-white border-slate-900"
+                    >
+                      <Edit2 className="size-4 md:size-3" />
+                      <span>Cancel</span>
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    onClick={() => {
+                      state.setIsBulkEditMode(true);
+                      state.setSelectedSwatchIds([]);
+                    }}
+                    className="hidden md:flex md:h-6 text-sm md:text-xs md:px-2.5 rounded-md md:rounded-sm border font-semibold transition-all items-center justify-center gap-2 md:gap-1 shadow-xs shrink-0 py-1 px-1 md:py-0 bg-white hover:bg-slate-50 text-slate-700 border-slate-200"
+                  >
+                    <Edit2 className="size-4 md:size-3" />
+                    <span>Edit Bulk</span>
+                  </Button>
+                )}
+              </>
             )}
             <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors cursor-pointer md:hidden">
               <X className="size-5" />
@@ -129,6 +166,7 @@ export default function StagingQueueOverlay({
 
         <StagingExecutionBar
           isMobile={state.isMobile}
+          onClose={onClose}
           isEditingAnySwatchOnMobile={state.isEditingAnySwatchOnMobile}
           batchName={batchName}
           setBatchName={setBatchName}

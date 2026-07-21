@@ -127,7 +127,10 @@ export default function SwatchCardEditForm({
       </div>
 
       <div className="order-3">
-        <label className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Material Content</label>
+        <label className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">
+          <span className="md:hidden">Content</span>
+          <span className="hidden md:inline">Material Content</span>
+        </label>
         <Input
           type="text"
           value={formData.content || ''}
@@ -138,7 +141,10 @@ export default function SwatchCardEditForm({
       </div>
 
       <div className="order-4">
-        <label className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Weave Structure</label>
+        <label className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">
+          <span className="md:hidden">Structure</span>
+          <span className="hidden md:inline">Weave Structure</span>
+        </label>
         <select
           value={formData.structure || ''}
           onChange={(e) => handleInputChange('structure', e.target.value)}
