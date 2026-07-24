@@ -3,17 +3,26 @@ import { Menu, Layers, SwatchBook, Plus, LogOut, Sun, Moon, CheckSquare, Square 
 import { clear } from 'idb-keyval';
 import MobileDrawer from './MobileDrawer.jsx';
 
-export default function Header({ activeModule, onNavigate, viewerTheme, setViewerTheme, showStagingQueue }) {
+export default function Header({ activeModule, onNavigate, viewerTheme, setViewerTheme, showStagingQueue, userRole = 'fabrito', setUserRole }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isBulkEdit, setIsBulkEdit] = useState(false);
+  const [headerTitleOverride, setHeaderTitleOverride] = useState(null);
 
   useEffect(() => {
     const handleBulkEditChanged = (e) => setIsBulkEdit(e.detail);
+    const handleTitleOverride = (e) => setHeaderTitleOverride(e.detail);
     window.addEventListener('all-swatches-bulk-edit-changed', handleBulkEditChanged);
-    return () => window.removeEventListener('all-swatches-bulk-edit-changed', handleBulkEditChanged);
+    window.addEventListener('customer-header-title-override', handleTitleOverride);
+    return () => {
+      window.removeEventListener('all-swatches-bulk-edit-changed', handleBulkEditChanged);
+      window.removeEventListener('customer-header-title-override', handleTitleOverride);
+    };
   }, []);
 
   const getModuleTitle = () => {
+    if (userRole === 'customer') {
+      return headerTitleOverride || 'Enquiry Stack';
+    }
     switch (activeModule) {
       case 'batch':
         return 'Batch Directory';
@@ -88,40 +97,44 @@ export default function Header({ activeModule, onNavigate, viewerTheme, setViewe
           </div>
 
           <div className="flex items-center gap-1">
-            {activeModule === 'all_swatches' && (
-              <button
-                onClick={() => {
-                  window.dispatchEvent(new CustomEvent('toggle-all-swatches-bulk-edit'));
-                }}
-                className="md:hidden p-1.5 -mr-1 rounded-md text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer flex items-center justify-center"
-                title="Select Swatches"
-              >
-                {isBulkEdit ? <CheckSquare className="size-5 text-indigo-600" strokeWidth={2} /> : <Square className="size-5" strokeWidth={2} />}
-              </button>
-            )}
-            {activeModule === 'logging' && setViewerTheme && !showStagingQueue && (
-              <button
-                type="button"
-                onClick={() => setViewerTheme(viewerTheme === 'dark' ? 'light' : 'dark')}
-                className="p-1.5 rounded-md text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer flex items-center justify-center"
-                title="Toggle Viewer Background"
-              >
-                {viewerTheme === 'dark' ? <Sun className="size-5" /> : <Moon className="size-5" />}
-              </button>
-            )}
-            {activeModule !== 'batch' && activeModule !== 'all_swatches' && activeModule !== 'logging' && (
-              <button
-                id="mobile-quick-log-btn"
-                onClick={() => onNavigate('logging')}
-                className={`p-1.5 rounded-md relative ${
-                  activeModule === 'logging'
-                    ? 'text-blue-600 bg-blue-50'
-                    : 'text-slate-700 hover:bg-slate-100'
-                }`}
-                title="Start New Session"
-              >
-                <Plus className="size-5" />
-              </button>
+            {userRole === 'fabrito' && (
+              <>
+                {activeModule === 'all_swatches' && (
+                  <button
+                    onClick={() => {
+                      window.dispatchEvent(new CustomEvent('toggle-all-swatches-bulk-edit'));
+                    }}
+                    className="md:hidden p-1.5 -mr-1 rounded-md text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer flex items-center justify-center"
+                    title="Select Swatches"
+                  >
+                    {isBulkEdit ? <CheckSquare className="size-5 text-indigo-600" strokeWidth={2} /> : <Square className="size-5" strokeWidth={2} />}
+                  </button>
+                )}
+                {activeModule === 'logging' && setViewerTheme && !showStagingQueue && (
+                  <button
+                    type="button"
+                    onClick={() => setViewerTheme(viewerTheme === 'dark' ? 'light' : 'dark')}
+                    className="p-1.5 rounded-md text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer flex items-center justify-center"
+                    title="Toggle Viewer Background"
+                  >
+                    {viewerTheme === 'dark' ? <Sun className="size-5" /> : <Moon className="size-5" />}
+                  </button>
+                )}
+                {activeModule !== 'batch' && activeModule !== 'all_swatches' && activeModule !== 'logging' && (
+                  <button
+                    id="mobile-quick-log-btn"
+                    onClick={() => onNavigate('logging')}
+                    className={`p-1.5 rounded-md relative ${
+                      activeModule === 'logging'
+                        ? 'text-blue-600 bg-blue-50'
+                        : 'text-slate-700 hover:bg-slate-100'
+                    }`}
+                    title="Start New Session"
+                  >
+                    <Plus className="size-5" />
+                  </button>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -132,6 +145,8 @@ export default function Header({ activeModule, onNavigate, viewerTheme, setViewe
         onClose={() => setIsDrawerOpen(false)}
         activeModule={activeModule}
         onNavigate={onNavigate}
+        userRole={userRole}
+        onRoleChange={setUserRole}
       />
     </>
   );

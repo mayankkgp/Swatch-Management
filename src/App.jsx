@@ -19,6 +19,7 @@ import { INITIAL_DEFAULTS } from './data/seedData.js';
 
 export default function App() {
   const [activeModule, setActiveModule] = useState('batch');
+  const [userRole, setUserRole] = useState('fabrito'); // 'fabrito' | 'customer'
   const [loading, setLoading] = useState(true);
   const [viewerTheme, setViewerTheme] = useState('dark');
   const [showStagingQueue, setShowStagingQueue] = useState(false);
@@ -88,6 +89,8 @@ export default function App() {
         viewerTheme={viewerTheme}
         setViewerTheme={setViewerTheme}
         showStagingQueue={showStagingQueue}
+        userRole={userRole}
+        setUserRole={setUserRole}
       />
 
       <div className="flex-1 flex overflow-hidden">
@@ -114,6 +117,7 @@ export default function App() {
           showStagingQueue={showStagingQueue}
           setShowStagingQueue={setShowStagingQueue}
           setActiveModule={setActiveModule}
+          userRole={userRole}
         />
       </div>
     </div>

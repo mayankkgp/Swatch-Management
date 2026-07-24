@@ -4,9 +4,11 @@
  */
 
 import React from 'react';
+import { User } from 'lucide-react';
 import BatchDirectory from './features/batches/BatchDirectory.jsx';
 import AllSwatchesStream from './features/swatches/AllSwatchesStream.jsx';
 import CaptureSession from './features/logging/CaptureSession.jsx';
+import CustomerLoginView from './features/customer/CustomerLoginView.jsx';
 
 export default function AppWorkspace({
   activeModule,
@@ -23,13 +25,16 @@ export default function AppWorkspace({
   setViewerTheme,
   showStagingQueue,
   setShowStagingQueue,
-  setActiveModule
+  setActiveModule,
+  userRole = 'fabrito'
 }) {
   return (
     <main
       id="workspace-canvas"
       className={`flex-1 bg-slate-50 transition-all duration-300 flex flex-col relative ${
-        (activeModule === 'batch' || activeModule === 'all_swatches' || activeModule === 'logging') ? 'p-0 md:p-3 overflow-hidden h-full' : 'p-4 md:p-3 overflow-y-auto'
+        userRole === 'customer' 
+          ? 'p-0 overflow-hidden h-full' 
+          : (activeModule === 'batch' || activeModule === 'all_swatches' || activeModule === 'logging') ? 'p-0 md:p-3 overflow-hidden h-full' : 'p-4 md:p-3 overflow-y-auto'
       }`}
     >
       {loading ? (
@@ -37,6 +42,8 @@ export default function AppWorkspace({
           <span className="size-5 rounded-full border-2 border-slate-300 border-t-slate-800 animate-spin" />
           <span>Simulating Network Latency • Hydrating Data Layer...</span>
         </div>
+      ) : userRole === 'customer' ? (
+        <CustomerLoginView />
       ) : (
         <>
           {refreshing && (
