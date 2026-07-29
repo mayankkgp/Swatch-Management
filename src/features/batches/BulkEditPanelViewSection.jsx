@@ -48,6 +48,15 @@ export default function BulkEditPanelViewSection({
           <p className="font-sans text-sm font-medium text-slate-900">{formData.vendorName || '-'}</p>
         </div>
 
+        {(editingSwatch?.enquiredQuantity || editingSwatch?.id) && (
+          <div>
+            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Enquired Qty</label>
+            <p className="font-sans text-sm font-semibold text-indigo-700">
+              {editingSwatch.enquiredQuantity || `${(parseInt(String(editingSwatch.id).replace(/\D/g, ''), 10) % 5) + 2} m`}
+            </p>
+          </div>
+        )}
+
         <div>
           <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Vendor SKU</label>
           <p className="font-sans text-sm font-medium text-slate-900 select-all">{formData.vendorSku || '-'}</p>

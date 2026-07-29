@@ -275,7 +275,7 @@ export default function CustomerEnquiryStackView({ onLogout }) {
       </AnimatePresence>
 
       {/* Main Container */}
-      <div className="flex-1 flex flex-col p-4 w-full max-w-md mx-auto">
+      <div className="flex-1 flex flex-col p-4 w-full max-w-md mx-auto min-w-0">
         
         {isSubmitted ? (
           <EnquirySubmittedState
@@ -286,8 +286,8 @@ export default function CustomerEnquiryStackView({ onLogout }) {
           <EnquiryEmptyState />
         ) : (
           /* POPULATED STATE: SWATCH CARDS STACK */
-          <div className="flex-1 flex flex-col pb-36">
-            <div className="space-y-3">
+          <div className="flex-1 flex flex-col pb-36 min-w-0">
+            <div className="space-y-3 min-w-0">
               <AnimatePresence initial={false}>
                 {/* Skeleton Card Loading UI when adding a new swatch */}
                 {(isAddingItem || isStartingNewEnquiry) && (

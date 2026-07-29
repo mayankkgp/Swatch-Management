@@ -9,6 +9,7 @@ import BatchDirectory from './features/batches/BatchDirectory.jsx';
 import AllSwatchesStream from './features/swatches/AllSwatchesStream.jsx';
 import CaptureSession from './features/logging/CaptureSession.jsx';
 import CustomerLoginView from './features/customer/CustomerLoginView.jsx';
+import EnquiriesDashboard from './features/enquiries/EnquiriesDashboard.jsx';
 
 export default function AppWorkspace({
   activeModule,
@@ -34,7 +35,7 @@ export default function AppWorkspace({
       className={`flex-1 bg-slate-50 transition-all duration-300 flex flex-col relative ${
         userRole === 'customer' 
           ? 'p-0 overflow-hidden h-full' 
-          : (activeModule === 'batch' || activeModule === 'all_swatches' || activeModule === 'logging') ? 'p-0 md:p-3 overflow-hidden h-full' : 'p-4 md:p-3 overflow-y-auto'
+          : (activeModule === 'batch' || activeModule === 'all_swatches' || activeModule === 'logging' || activeModule === 'enquiries') ? 'p-0 md:p-3 overflow-hidden h-full' : 'p-4 md:p-3 overflow-y-auto'
       }`}
     >
       {loading ? (
@@ -88,6 +89,9 @@ export default function AppWorkspace({
               showStagingQueue={showStagingQueue}
               setShowStagingQueue={setShowStagingQueue}
             />
+          )}
+          {activeModule === 'enquiries' && (
+            <EnquiriesDashboard />
           )}
         </>
       )}

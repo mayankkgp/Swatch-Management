@@ -12,7 +12,13 @@ export const CUSTOMER_SESSION_KEY = 'customer_session';
 
 export function getLocal(key) {
   const raw = localStorage.getItem(key);
-  return raw ? JSON.parse(raw) : null;
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch (err) {
+    console.error(`[STORAGE] Failed to parse key "${key}" from localStorage:`, err);
+    return null;
+  }
 }
 
 export function setLocal(key, value) {

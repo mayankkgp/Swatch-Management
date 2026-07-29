@@ -16,6 +16,7 @@ export default function BulkEditPanel({
   selectedCount,
   editingSwatch, // Single swatch details if we are in single edit mode
   isViewOnly = false,
+  hideEditCTA = false,
   onSave,
   onDiscard,
   onDelete,
@@ -169,6 +170,7 @@ export default function BulkEditPanel({
       {/* Footer Buttons */}
       <BulkEditPanelFooterActions
         isViewOnly={isViewOnly}
+        hideEditCTA={hideEditCTA}
         onEdit={onEdit}
         editingSwatch={editingSwatch}
         onDiscard={onDiscard}

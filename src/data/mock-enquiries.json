@@ -1,0 +1,121 @@
+[
+  {
+    "id": "E-101",
+    "date": "25-07-26",
+    "phone": "+91 98765 43210",
+    "customer": "Acme Textiles",
+    "swatchCount": 6,
+    "am": "Priya S.",
+    "status": "pending",
+    "notes": "Urgent swatch request for upcoming autumn collection"
+  },
+  {
+    "id": "E-102",
+    "date": "25-07-26",
+    "phone": "+91 91234 56789",
+    "customer": "Vogue Design Studio",
+    "swatchCount": 4,
+    "am": "Ankit K.",
+    "status": "pending",
+    "notes": "Requested organic linen and silk blend swatches"
+  },
+  {
+    "id": "E-103",
+    "date": "24-07-26",
+    "phone": "+91 99887 76655",
+    "customer": "",
+    "swatchCount": 2,
+    "am": "Unassigned",
+    "status": "pending",
+    "notes": "Direct scan enquiry from customer mobile login"
+  },
+  {
+    "id": "E-104",
+    "date": "24-07-26",
+    "phone": "+91 98111 22233",
+    "customer": "Rahul Sharma",
+    "swatchCount": 8,
+    "am": "Priya S.",
+    "status": "pending",
+    "notes": "Cotton twill and canvas samples requested"
+  },
+  {
+    "id": "E-105",
+    "date": "23-07-26",
+    "phone": "+91 97654 32109",
+    "customer": "Aura Fashion House",
+    "swatchCount": 12,
+    "am": "Vikram R.",
+    "status": "pending",
+    "notes": "Bulk swatch request for export catalog"
+  },
+  {
+    "id": "E-201",
+    "date": "24-07-26",
+    "phone": "+91 95555 44433",
+    "customer": "Fabrics & Co.",
+    "swatchCount": 5,
+    "am": "Neha M.",
+    "status": "in_progress",
+    "notes": "Dispatch pending via courier service"
+  },
+  {
+    "id": "E-202",
+    "date": "23-07-26",
+    "phone": "+91 94444 33322",
+    "customer": "",
+    "swatchCount": 3,
+    "am": "Ankit K.",
+    "status": "in_progress",
+    "notes": "Sample cut in progress at warehouse"
+  },
+  {
+    "id": "E-203",
+    "date": "22-07-26",
+    "phone": "+91 93333 22211",
+    "customer": "Urban Couture",
+    "swatchCount": 9,
+    "am": "Vikram R.",
+    "status": "in_progress",
+    "notes": "Awaiting client confirmation on color swatches"
+  },
+  {
+    "id": "E-301",
+    "date": "20-07-26",
+    "phone": "+91 92222 11100",
+    "customer": "Monolith Apparel",
+    "swatchCount": 7,
+    "am": "Priya S.",
+    "status": "past",
+    "outcome": "Converted",
+    "notes": "Swatches delivered and order placed",
+    "swatchIds": ["S-001", "S-002", "S-003", "S-004", "S-005", "S-006", "S-007"],
+    "rejectedSwatchIds": ["S-002", "S-005"]
+  },
+  {
+    "id": "E-302",
+    "date": "18-07-26",
+    "phone": "+91 91111 00099",
+    "customer": "Kavya Designs",
+    "swatchCount": 3,
+    "am": "Neha M.",
+    "status": "past",
+    "outcome": "Converted",
+    "notes": "Completed and archived",
+    "swatchIds": ["S-001", "S-002", "S-003"],
+    "rejectedSwatchIds": ["S-002"]
+  },
+  {
+    "id": "E-303",
+    "date": "15-07-26",
+    "phone": "+91 90000 88877",
+    "customer": "",
+    "swatchCount": 1,
+    "am": "Unassigned",
+    "status": "past",
+    "outcome": "Dropped",
+    "notes": "Cancelled by customer",
+    "swatchIds": ["S-001"],
+    "rejectedSwatchIds": ["S-001"]
+  }
+]

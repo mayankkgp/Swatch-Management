@@ -66,6 +66,8 @@ export async function verifyCustomerOtp(otp, sessionData) {
     loggedInAt: Date.now()
   };
   setLocal(CUSTOMER_SESSION_KEY, updatedSession);
+  setLocal(CUSTOMER_ENQUIRY_STACK_KEY, []);
+  removeLocal(CUSTOMER_ENQUIRY_SUBMITTED_KEY);
   return { success: true, session: updatedSession };
 }
 
@@ -82,6 +84,8 @@ export async function resendCustomerOtp(sessionData) {
 export async function clearCustomerSession() {
   await simulateNetwork();
   removeLocal(CUSTOMER_SESSION_KEY);
+  removeLocal(CUSTOMER_ENQUIRY_STACK_KEY);
+  removeLocal(CUSTOMER_ENQUIRY_SUBMITTED_KEY);
   return null;
 }
 

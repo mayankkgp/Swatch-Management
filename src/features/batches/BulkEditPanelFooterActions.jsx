@@ -15,9 +15,13 @@ export default function BulkEditPanelFooterActions({
   isSaving,
   handleSave,
   isDisabled,
-  setShowConfirmDelete
+  setShowConfirmDelete,
+  hideEditCTA = false
 }) {
   if (isViewOnly) {
+    if (hideEditCTA || !onEdit) {
+      return null;
+    }
     return (
       <div className="py-2 px-1.5 border-t border-slate-200 flex gap-1.5 shrink-0 bg-slate-50">
         <Button

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, Layers, SwatchBook, Plus, LogOut, Sun, Moon, CheckSquare, Square } from 'lucide-react';
-import { clear } from 'idb-keyval';
 import MobileDrawer from './MobileDrawer.jsx';
 
 export default function Header({ activeModule, onNavigate, viewerTheme, setViewerTheme, showStagingQueue, userRole = 'fabrito', setUserRole }) {
@@ -30,6 +29,8 @@ export default function Header({ activeModule, onNavigate, viewerTheme, setViewe
         return 'All Swatches';
       case 'logging':
         return 'Add swatches';
+      case 'enquiries':
+        return 'Enquiries';
       default:
         return 'Swatch Interface';
     }
@@ -67,7 +68,7 @@ export default function Header({ activeModule, onNavigate, viewerTheme, setViewe
               id="header-logout-btn"
               onClick={() => {
                 if (window.confirm("Are you sure you want to log out? This will reset the local database to seeds.")) {
-                  clear(); localStorage.clear();
+                  localStorage.clear();
                   window.location.reload();
                 }
               }}

@@ -84,36 +84,36 @@ export default function EnquirySwatchCard({
       </div>
 
       {/* Right side: Swatch Card Display Section */}
-      <div className="px-3 pt-2 pb-4 flex-1 flex flex-col justify-between gap-2 self-stretch min-w-0 text-left">
-        <div className="flex flex-col justify-between h-full w-full">
+      <div className="px-3 py-2 flex-1 flex flex-col justify-between gap-2 self-stretch min-w-0 text-left">
+        <div className="flex flex-col justify-between h-full w-full min-w-0">
           <div className="flex flex-col justify-between h-full w-full min-w-0 text-left">
-            <div className="space-y-1.5 text-slate-700 font-mono text-[12px] leading-snug min-w-0 w-full">
+            <div className="space-y-1 text-slate-700 font-mono text-[12px] leading-snug min-w-0 w-full">
               {/* Row 1: SKU ID and Static Quantity */}
-              <div className="break-words w-full flex flex-wrap items-center gap-x-1">
-                <span className="text-slate-800 font-bold">{item.id || item.skuId || item.vendorSku || '-'}</span>
+              <div className="break-words w-full flex flex-wrap items-center gap-x-1 min-w-0">
+                <span className="text-slate-800 font-bold truncate max-w-full">{item.id || item.skuId || item.vendorSku || '-'}</span>
                 <span className="text-slate-300 font-sans font-normal shrink-0 mx-1">•</span>
-                <span className="text-slate-500 font-normal">
+                <span className="text-slate-500 font-normal shrink-0">
                   {item.quantity ? `${item.quantity}${item.unit || 'm'}` : '100m'}
                 </span>
               </div>
 
               {/* Row 2: Structure */}
-              <div className="text-slate-500 break-words w-full">
+              <div className="text-slate-500 break-words w-full min-w-0">
                 {item.structure || '-'}
               </div>
 
               {/* Row 3: Material Content */}
-              <div className="text-slate-500 break-words w-full">
+              <div className="text-slate-500 break-words w-full min-w-0">
                 {item.content || '-'}
               </div>
             </div>
 
-            {/* ENQ input CTA */}
-            <div className="mt-auto pt-3 mb-1 flex items-center gap-2 w-full">
-              <span className="text-[11px] font-mono font-bold text-slate-500 uppercase shrink-0">
-                ENQ
+            {/* REQUIRED QTY input CTA */}
+            <div className="mt-auto pt-2 flex flex-col gap-1 w-full min-w-0">
+              <span className="text-[10px] font-mono font-bold text-slate-500 uppercase shrink-0">
+                REQUIRED QTY
               </span>
-              <div className="flex-1 h-8 bg-slate-50 hover:bg-slate-100/80 focus-within:bg-white text-slate-700 font-semibold text-xs border border-slate-200 focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-indigo-500/10 rounded-md flex items-center justify-between px-2.5 transition-all">
+              <div className="w-full min-w-0 h-8 bg-slate-50 hover:bg-slate-100/80 focus-within:bg-white text-slate-700 font-semibold text-xs border border-slate-200 focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-indigo-500/10 rounded-md flex items-center justify-between px-2.5 transition-all">
                 <input
                   ref={index === 0 ? topInputRef : null}
                   type="tel"

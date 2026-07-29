@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layers, SwatchBook, Plus } from 'lucide-react';
+import { Layers, SwatchBook, MessageSquare, Plus } from 'lucide-react';
 
 export default function Sidebar({ activeModule, onNavigate }) {
   return (
@@ -35,6 +35,20 @@ export default function Sidebar({ activeModule, onNavigate }) {
           }`}
         >
           <SwatchBook className="size-3.5" />
+        </button>
+
+        {/* [ Enquiries ] Navigation CTA */}
+        <button
+          id="sidebar-nav-enquiries"
+          onClick={() => onNavigate('enquiries')}
+          title="Enquiries"
+          className={`flex items-center justify-center size-6 rounded-md transition-all ${
+            activeModule === 'enquiries'
+              ? 'bg-slate-900 text-white'
+              : 'text-slate-600 hover:bg-slate-200 hover:text-slate-900'
+          }`}
+        >
+          <MessageSquare className="size-3.5" />
         </button>
 
         <div className="w-full flex justify-center pt-2 border-t border-slate-100 mt-0.5">
