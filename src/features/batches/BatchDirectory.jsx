@@ -41,6 +41,9 @@ export default function BatchDirectory({
   const [isBulkEditMode, setIsBulkEditMode] = useState(false);
   const [selectedSwatchIds, setSelectedSwatchIds] = useState([]);
   const [isSavingBulk, setIsSavingBulk] = useState(false);
+  const [isSavingSingle, setIsSavingSingle] = useState(false);
+  const [isDeletingBulk, setIsDeletingBulk] = useState(false);
+  const [isDeletingSingle, setIsDeletingSingle] = useState(false);
   const [editingSwatchId, setEditingSwatchId] = useState(null);
   const [viewingSwatchId, setViewingSwatchId] = useState(null);
 
@@ -66,7 +69,7 @@ export default function BatchDirectory({
   }, [batches]);
 
   const handleSaveSingle = async (modifiedFields) => {
-    setIsSavingBulk(true);
+    setIsSavingSingle(true);
     try {
       const swatchToUpdate = swatches.find(s => s.id === editingSwatchId);
       if (swatchToUpdate) {
@@ -74,25 +77,27 @@ export default function BatchDirectory({
       }
       setEditingSwatchId(null);
       setViewingSwatchId(null);
-      await onRefresh();
+      const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
+      await onRefresh(!isDesktop);
     } catch (err) {
       console.error('[DIRECTORY] Single update failed:', err);
     } finally {
-      setIsSavingBulk(false);
+      setIsSavingSingle(false);
     }
   };
 
   const handleDeleteSingle = async () => {
-    setIsSavingBulk(true);
+    setIsDeletingSingle(true);
     try {
       await deleteSwatchesBulk([editingSwatchId]);
       setEditingSwatchId(null);
       setViewingSwatchId(null);
-      await onRefresh();
+      const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
+      await onRefresh(!isDesktop);
     } catch (err) {
       console.error('[DIRECTORY] Single delete failed:', err);
     } finally {
-      setIsSavingBulk(false);
+      setIsDeletingSingle(false);
     }
   };
 
@@ -108,7 +113,8 @@ export default function BatchDirectory({
       await saveSwatchesBulk(swatchesToUpdate);
       setIsBulkEditMode(false);
       setSelectedSwatchIds([]);
-      await onRefresh();
+      const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
+      await onRefresh(!isDesktop);
     } catch (err) {
       console.error('[DIRECTORY] Bulk update failed:', err);
     } finally {
@@ -117,16 +123,17 @@ export default function BatchDirectory({
   };
 
   const handleDeleteBulk = async () => {
-    setIsSavingBulk(true);
+    setIsDeletingBulk(true);
     try {
       await deleteSwatchesBulk(selectedSwatchIds);
       setIsBulkEditMode(false);
       setSelectedSwatchIds([]);
-      await onRefresh();
+      const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
+      await onRefresh(!isDesktop);
     } catch (err) {
       console.error('[DIRECTORY] Bulk delete failed:', err);
     } finally {
-      setIsSavingBulk(false);
+      setIsDeletingBulk(false);
     }
   };
 
@@ -327,6 +334,7 @@ export default function BatchDirectory({
         {selectedBatchId && (
           <div className="flex-1 h-full overflow-hidden bg-slate-50">
             <BatchDetailsView
+              key={selectedBatchId}
               batchId={selectedBatchId}
               batches={batches}
               swatches={swatches}
@@ -344,6 +352,9 @@ export default function BatchDirectory({
               selectedSwatchIds={selectedSwatchIds}
               setSelectedSwatchIds={setSelectedSwatchIds}
               isSavingBulk={isSavingBulk}
+              isSavingSingle={isSavingSingle}
+              isDeletingBulk={isDeletingBulk}
+              isDeletingSingle={isDeletingSingle}
               editingSwatchId={editingSwatchId}
               onEditSwatch={(swatch) => {
                 setEditingSwatchId(swatch.id);

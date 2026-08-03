@@ -30,14 +30,14 @@ export default function App() {
   const [resumeBatchId, setResumeBatchId] = useState(null);
 
   // Load and Hydrate Local Data Layer
-  const refreshData = useCallback(async (showGlobalSpinner = false) => {
+  const refreshData = useCallback(async (showGlobalSpinner = false, skipNetwork = false) => {
     if (showGlobalSpinner) {
       setRefreshing(true);
     }
     try {
       console.log('[DATA LAYER] Fetching latest datasets from local storage transaction engine...');
-      const loadedBatches = await fetchBatches();
-      const loadedSwatches = await fetchSwatches();
+      const loadedBatches = await fetchBatches(skipNetwork);
+      const loadedSwatches = await fetchSwatches(skipNetwork);
       const loadedDefaults = await fetchActiveDefaults();
 
       setBatches(loadedBatches);

@@ -25,15 +25,30 @@ export default function SwatchCard({
   batchId = null,
   onView,
   onEdit,
-  onMobileEditStateChange
+  onMobileEditStateChange,
+  isSavingBulk = false,
+  isSavingSingle = false,
+  isDeletingBulk = false,
+  isDeletingSingle = false
 }) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isEditLoading, setIsEditLoading] = useState(false);
+  const editTimerRef = useRef(null);
   const [formData, setFormData] = useState({ ...swatch });
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [vendorSearchFocused, setVendorSearchFocused] = useState(false);
   const [structureSearchFocused, setStructureSearchFocused] = useState(false);
   const [showImageSourcePicker, setShowImageSourcePicker] = useState(false);
   const imageSourcePickerRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (editTimerRef.current) {
+        clearTimeout(editTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!showImageSourcePicker) return;
@@ -69,9 +84,24 @@ export default function SwatchCard({
   };
 
   const changeEditingState = (val) => {
-    setIsEditing(val);
-    if (onMobileEditStateChange) {
-      onMobileEditStateChange(swatch.id, val);
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    if (val && isMobile) {
+      setIsEditLoading(true);
+      setIsEditing(true);
+      if (onMobileEditStateChange) {
+        onMobileEditStateChange(swatch.id, true);
+      }
+      if (editTimerRef.current) clearTimeout(editTimerRef.current);
+      editTimerRef.current = setTimeout(() => {
+        setIsEditLoading(false);
+      }, 400);
+    } else {
+      if (editTimerRef.current) clearTimeout(editTimerRef.current);
+      setIsEditLoading(false);
+      setIsEditing(val);
+      if (onMobileEditStateChange) {
+        onMobileEditStateChange(swatch.id, val);
+      }
     }
   };
 
@@ -81,7 +111,7 @@ export default function SwatchCard({
     startDeleteCountdown,
     cancelDeleteCountdown,
     triggerDelete
-  } = useSwatchDeleteCountdown(onDelete, swatch.id, setIsSaving);
+  } = useSwatchDeleteCountdown(onDelete, swatch.id, setIsDeleting);
 
   // Sync state if swatch prop updates
   useEffect(() => {
@@ -109,6 +139,10 @@ export default function SwatchCard({
     setFormData({ ...swatch });
     changeEditingState(false);
   };
+
+  if (isEditLoading) {
+    return <SwatchEditSkeletonCard />;
+  }
 
   return (
     <div 
@@ -166,11 +200,43 @@ export default function SwatchCard({
         startDeleteCountdown={startDeleteCountdown}
       />
 
-      {isSaving && (
-        <div className="absolute inset-0 bg-white/70 backdrop-blur-[1px] z-20 flex items-center justify-center">
-          <span className="size-4 rounded-full border-2 border-slate-300 border-t-slate-800 animate-spin" />
-        </div>
-      )}
+      {(() => {
+        const isDesktop = typeof window !== 'undefined' ? window.innerWidth >= 768 : true;
+        const isFabricDeleting = isDeleting || (isDesktop && (
+          isDeletingSingle || (isDeletingBulk && isSelected)
+        ));
+        const isFabricSaving = isSaving || (isDesktop && (
+          (isSavingBulk || isSavingSingle) && (isSelected || isCurrentlyEditing)
+        ));
+
+        if (isFabricDeleting) {
+          return (
+            <div className="absolute inset-0 bg-white/90 backdrop-blur-[2px] z-30 flex flex-col items-center justify-center gap-1.5 p-2 text-center rounded-lg animate-in fade-in duration-150 shadow-xs select-none pointer-events-none border border-red-100">
+              <div className="relative flex items-center justify-center">
+                <span className="size-6 border-2 border-red-200 border-t-red-600 rounded-full animate-spin shrink-0" />
+              </div>
+              <span className="text-[11px] font-mono font-medium text-red-700 bg-red-50/95 border border-red-200/80 px-2.5 py-0.5 rounded-full shadow-2xs">
+                Deleting swatch...
+              </span>
+            </div>
+          );
+        }
+
+        if (isFabricSaving) {
+          return (
+            <div className="absolute inset-0 bg-white/85 backdrop-blur-[1.5px] z-30 flex flex-col items-center justify-center gap-1.5 p-2 text-center rounded-lg animate-in fade-in duration-150 shadow-xs select-none pointer-events-none">
+              <div className="relative flex items-center justify-center">
+                <span className="size-6 border-2 border-indigo-200 border-t-indigo-600 rounded-full animate-spin shrink-0" />
+              </div>
+              <span className="text-[11px] font-mono font-medium text-indigo-700 bg-indigo-50/95 border border-indigo-200/80 px-2.5 py-0.5 rounded-full shadow-2xs">
+                Saving...
+              </span>
+            </div>
+          );
+        }
+
+        return null;
+      })()}
 
       <SwatchCardDeleteOverlay
         isMobileOnly={false}
@@ -207,6 +273,50 @@ export default function SwatchCard({
             onSave={onSave}
           />
         )}
+      </div>
+    </div>
+  );
+}
+
+function SwatchEditSkeletonCard() {
+  return (
+    <div className="bg-white rounded-xl shadow-2xs border border-slate-200/90 p-3.5 animate-pulse select-none w-full flex flex-col gap-3 justify-between min-h-[220px]">
+      <div className="space-y-2.5">
+        {/* Header bar skeleton */}
+        <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
+          <div className="h-3.5 bg-slate-200/80 rounded-xs w-28" />
+          <div className="h-3 bg-indigo-100/80 rounded-xs w-12" />
+        </div>
+
+        {/* Form Field 1: Vendor Name */}
+        <div className="space-y-1 pt-1">
+          <div className="h-2 bg-slate-200/70 rounded-xs w-16" />
+          <div className="h-8 bg-slate-100/90 rounded-md w-full border border-slate-200/50" />
+        </div>
+
+        {/* Form Field 2 & 3: SKU & Qty */}
+        <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-1">
+            <div className="h-2 bg-slate-200/70 rounded-xs w-14" />
+            <div className="h-8 bg-slate-100/90 rounded-md w-full border border-slate-200/50" />
+          </div>
+          <div className="space-y-1">
+            <div className="h-2 bg-slate-200/70 rounded-xs w-12" />
+            <div className="h-8 bg-slate-100/90 rounded-md w-full border border-slate-200/50" />
+          </div>
+        </div>
+
+        {/* Form Field 4: Structure */}
+        <div className="space-y-1">
+          <div className="h-2 bg-slate-200/70 rounded-xs w-14" />
+          <div className="h-8 bg-slate-100/90 rounded-md w-full border border-slate-200/50" />
+        </div>
+
+        {/* Form Field 5: Composition */}
+        <div className="space-y-1">
+          <div className="h-2 bg-slate-200/70 rounded-xs w-20" />
+          <div className="h-8 bg-slate-100/90 rounded-md w-full border border-slate-200/50" />
+        </div>
       </div>
     </div>
   );

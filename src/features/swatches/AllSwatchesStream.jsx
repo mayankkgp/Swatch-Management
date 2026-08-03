@@ -52,6 +52,9 @@ export default function AllSwatchesStream({
   const [selectedSwatchIds, setSelectedSwatchIds] = useState([]);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
   const [isDeletingBulk, setIsDeletingBulk] = useState(false);
+  const [isSavingBulk, setIsSavingBulk] = useState(false);
+  const [isDeletingSingle, setIsDeletingSingle] = useState(false);
+  const [deletingSwatchId, setDeletingSwatchId] = useState(null);
 
   useEffect(() => {
     const handleToggle = () => setIsBulkEditMode(p => !p);
@@ -116,12 +119,19 @@ export default function AllSwatchesStream({
 
   const handleSaveInline = async (swatchId, updatedData) => {
     await saveSwatch(updatedData);
-    await onRefresh();
+    await onRefresh(false);
   };
 
   const handleDeleteInline = async (swatchId) => {
-    await deleteSwatch(swatchId);
-    await onRefresh();
+    setDeletingSwatchId(swatchId);
+    try {
+      await deleteSwatch(swatchId);
+      await onRefresh(false);
+    } catch (err) {
+      console.error('[STREAM] Delete inline failed:', err);
+    } finally {
+      setDeletingSwatchId(null);
+    }
   };
 
   const handleSaveSingle = async (modifiedFields) => {
@@ -131,7 +141,7 @@ export default function AllSwatchesStream({
       if (swatchToUpdate) await saveSwatch({ ...swatchToUpdate, ...modifiedFields });
       setEditingSwatchId(null);
       setViewingSwatchId(null);
-      await onRefresh();
+      await onRefresh(false);
     } catch (err) {
       console.error('[STREAM] Single update failed:', err);
     } finally {
@@ -140,16 +150,16 @@ export default function AllSwatchesStream({
   };
 
   const handleDeleteSingle = async () => {
-    setIsSavingSingle(true);
+    setIsDeletingSingle(true);
     try {
       await deleteSwatch(editingSwatchId);
       setEditingSwatchId(null);
       setViewingSwatchId(null);
-      await onRefresh();
+      await onRefresh(false);
     } catch (err) {
       console.error('[STREAM] Single delete failed:', err);
     } finally {
-      setIsSavingSingle(false);
+      setIsDeletingSingle(false);
     }
   };
 
@@ -160,7 +170,7 @@ export default function AllSwatchesStream({
       setSelectedSwatchIds([]);
       setIsBulkEditMode(false);
       setShowBulkDeleteModal(false);
-      await onRefresh();
+      await onRefresh(false);
     } catch (err) {
       console.error('[STREAM] Bulk delete failed:', err);
     } finally {
@@ -219,6 +229,8 @@ export default function AllSwatchesStream({
               toDate={toDate}
               setToDate={setToDate}
               resetFilters={resetFilters}
+              isSavingSingle={isSavingSingle}
+              isDeletingBulk={isDeletingBulk}
             />
           )}
 
@@ -288,6 +300,11 @@ export default function AllSwatchesStream({
             pageInput={pageInput}
             handlePageInputChange={handlePageInputChange}
             handlePageInputBlur={handlePageInputBlur}
+            isSavingSingle={isSavingSingle}
+            isDeletingSingle={isDeletingSingle}
+            deletingSwatchId={deletingSwatchId}
+            isDeletingBulk={isDeletingBulk}
+            isSavingBulk={isSavingBulk}
           />
 
           <AllSwatchesStreamPagination

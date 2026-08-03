@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronUp } from 'lucide-react';
 import { VENDOR_NAMES, STRUCTURES } from '../../data/seedData';
 import Input from '../../components/ui/Input';
@@ -13,11 +13,18 @@ export default function MobileInputTray({
   handleInputChange,
   applyToCurrentOnly,
   setApplyToCurrentOnly,
-  getCollapsedText
+  getCollapsedText,
+  isNextLoading = false
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [vendorSearchFocused, setVendorSearchFocused] = useState(false);
   const [structureSearchFocused, setStructureSearchFocused] = useState(false);
+
+  useEffect(() => {
+    if (isNextLoading) {
+      setIsExpanded(false);
+    }
+  }, [isNextLoading]);
 
   const filteredVendorNames = VENDOR_NAMES.filter(v => 
     v.toLowerCase().includes((formData.vendorName || '').toLowerCase())
@@ -30,12 +37,21 @@ export default function MobileInputTray({
   return (
     <div className={`md:hidden flex-none relative ${isExpanded ? 'z-30' : 'z-10'}`}>
       <div 
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="bg-white border-b border-slate-200 p-1.5 cursor-pointer hover:bg-slate-50 active:bg-slate-100 transition-colors"
+        onClick={() => !isNextLoading && setIsExpanded(!isExpanded)}
+        className="bg-white border-b border-slate-200 p-1.5 cursor-pointer hover:bg-slate-50 active:bg-slate-100 transition-colors min-h-[33px] flex items-center"
       >
-        <div className="text-[12px] font-normal text-slate-600 leading-normal break-words">
-          {getCollapsedText()}
-        </div>
+        {isNextLoading ? (
+          <div className="w-full flex items-center gap-2 px-0.5">
+            <div className="size-3 rounded-full border border-indigo-500/30 border-t-indigo-600 animate-spin shrink-0" />
+            <span className="text-[11px] font-mono font-medium text-slate-600 tracking-wide">
+              Updating attributes...
+            </span>
+          </div>
+        ) : (
+          <div className="text-[12px] font-normal text-slate-600 leading-normal break-words">
+            {getCollapsedText()}
+          </div>
+        )}
       </div>
 
       {isExpanded && (

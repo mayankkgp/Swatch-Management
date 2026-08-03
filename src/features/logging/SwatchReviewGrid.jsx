@@ -20,7 +20,11 @@ export default function SwatchReviewGrid({
   setViewingSwatchId,
   setEditingSwatchId,
   setIsBulkEditMode,
-  setMobileEditingSwatchId
+  setMobileEditingSwatchId,
+  isSavingBulk = false,
+  isSavingSingle = false,
+  isDeletingBulk = false,
+  isDeletingSingle = false
 }) {
   const displayedSwatches = isEditingAnySwatchOnMobile 
     ? reviewSwatches.filter(s => s.id === mobileEditingSwatchId) 
@@ -39,6 +43,10 @@ export default function SwatchReviewGrid({
             isBulkEditMode={isBulkEditMode}
             isSelected={selectedSwatchIds.includes(swatch.id)}
             isCurrentlyEditing={editingSwatchId === swatch.id}
+            isSavingBulk={isSavingBulk}
+            isSavingSingle={isSavingSingle}
+            isDeletingBulk={isDeletingBulk}
+            isDeletingSingle={isDeletingSingle}
             onToggleSelect={() => handleToggleSelectSwatch(swatch.id)}
             onSave={(swatchId, data) => handleSaveSwatchInline(swatchId, data)}
             onDelete={() => handleDeleteSwatchInline(swatch.id)}

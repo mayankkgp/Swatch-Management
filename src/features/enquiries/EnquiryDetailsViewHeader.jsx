@@ -405,7 +405,7 @@ function ClosedActionRow({
         type="button"
         disabled={isReopening}
         onClick={handleConfirmReopen}
-        className="h-6 text-xs px-2.5 rounded-sm bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-xs cursor-pointer flex items-center gap-1 disabled:opacity-80 disabled:cursor-wait"
+        className="h-6 text-xs px-2.5 rounded-sm bg-amber-600 hover:bg-amber-700 text-white font-semibold shadow-xs cursor-pointer flex items-center gap-1 disabled:opacity-80 disabled:cursor-wait"
       >
         {isReopening ? (
           <>
@@ -429,7 +429,8 @@ export default function EnquiryDetailsViewHeader({
   rejectedSkuCount = 0,
   onUpdateEnquiry,
   onClose,
-  isViewingSwatch = false
+  isViewingSwatch = false,
+  isPaneLoading = false
 }) {
   const [showAmDropdown, setShowAmDropdown] = useState(false);
   const amDropdownRef = useRef(null);
@@ -499,6 +500,34 @@ export default function EnquiryDetailsViewHeader({
       return () => clearTimeout(timer);
     }
   }, [activeActionMode]);
+
+  if (isPaneLoading) {
+    return (
+      <div className="sticky top-0 md:relative z-30 bg-white border-b border-slate-200 p-3 flex items-center justify-between shadow-xs min-h-[48px] md:h-12 py-1.5 md:py-0 shrink-0 w-full select-none">
+        <div className="flex items-center gap-1.5 min-w-0 flex-1">
+          <div className="flex flex-col md:flex-row md:items-center md:gap-x-3 gap-y-1 w-full min-w-0">
+            <div className="flex items-center gap-1.5">
+              <div className="h-4 bg-slate-200 rounded-md w-32 sm:w-44 md:w-48 animate-pulse shrink-0" />
+              <div className="h-3.5 w-3.5 bg-slate-200/60 rounded-xs animate-pulse shrink-0 hidden md:block" />
+            </div>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <div className="h-3 bg-slate-200/70 rounded-xs w-16 animate-pulse" />
+              <span className="text-slate-300 font-sans text-[10px]">•</span>
+              <div className="h-3 bg-slate-200/60 rounded-xs w-14 animate-pulse" />
+              <span className="text-slate-300 font-sans text-[10px]">•</span>
+              <div className="h-3 bg-slate-200/60 rounded-xs w-12 animate-pulse" />
+            </div>
+          </div>
+        </div>
+        <div className="hidden md:flex items-center shrink-0 gap-2">
+          <div className="h-6 w-20 bg-slate-200/70 rounded-xs animate-pulse" />
+          <div className="h-6 w-14 bg-indigo-200/60 rounded-xs animate-pulse" />
+          <div className="w-2" />
+          <div className="size-6 bg-slate-200/50 rounded-xs animate-pulse" />
+        </div>
+      </div>
+    );
+  }
 
   if (!enquiry) return null;
 

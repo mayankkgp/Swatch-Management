@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 
-export default function useSwatchDeleteCountdown(onDelete, swatchId, setIsSaving) {
+export default function useSwatchDeleteCountdown(onDelete, swatchId, setIsDeleting) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [countdownProgress, setCountdownProgress] = useState(0);
   const timerRef = useRef(null);
@@ -21,14 +21,14 @@ export default function useSwatchDeleteCountdown(onDelete, swatchId, setIsSaving
   const triggerDelete = async () => {
     if (timerRef.current) clearTimeout(timerRef.current);
     if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
-    setIsSaving(true);
+    setShowDeleteConfirm(false);
+    if (setIsDeleting) setIsDeleting(true);
     try {
       await onDelete(swatchId);
     } catch (err) {
       console.error('[Countdown] Swatch deletion failed:', err);
     } finally {
-      setIsSaving(false);
-      setShowDeleteConfirm(false);
+      if (setIsDeleting) setIsDeleting(false);
     }
   };
 

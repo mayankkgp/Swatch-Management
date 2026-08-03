@@ -16,6 +16,42 @@ import {
 // Modular sub-components
 import BatchDetailsViewHeader from './BatchDetailsViewHeader';
 import BatchDetailsViewRenameModal from './BatchDetailsViewRenameModal';
+import EnquirySkeletonCard from '../customer/EnquirySkeletonCard';
+
+export function BatchSwatchSkeletonCard() {
+  return (
+    <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-2xs animate-pulse flex flex-col w-full">
+      {/* Image Skeleton */}
+      <div
+        className="w-full bg-slate-200 border-b border-slate-100"
+        style={{ aspectRatio: '3/4' }}
+      />
+      {/* Details Skeleton */}
+      <div className="px-3 pt-1.5 pb-2 flex-1 flex flex-col justify-between gap-1.5 bg-white">
+        <div className="space-y-1">
+          {/* Row 1: Vendor Name & Quantity */}
+          <div className="flex items-center justify-between gap-2 h-[14px]">
+            <div className="h-2.5 bg-slate-200 rounded-xs w-2/3" />
+            <div className="h-2.5 bg-slate-200/70 rounded-xs w-1/4" />
+          </div>
+          {/* Row 2: Vendor SKU & Structure */}
+          <div className="flex items-center justify-between gap-2 h-[14px]">
+            <div className="h-2 bg-slate-200/60 rounded-xs w-1/2" />
+            <div className="h-2 bg-slate-200/50 rounded-xs w-1/3" />
+          </div>
+          {/* Row 3: Material Content */}
+          <div className="flex items-center h-[14px]">
+            <div className="h-2 bg-slate-200/50 rounded-xs w-4/5" />
+          </div>
+          {/* Row 4: SKU ID Badge */}
+          <div className="flex items-center h-[14px] pt-0.5">
+            <div className="h-2.5 bg-indigo-100/80 rounded-xs w-2/5" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function BatchDetailsView({
   batchId,
@@ -29,6 +65,9 @@ export default function BatchDetailsView({
   selectedSwatchIds = [],
   setSelectedSwatchIds = () => {},
   isSavingBulk = false,
+  isSavingSingle = false,
+  isDeletingBulk = false,
+  isDeletingSingle = false,
   editingSwatchId = null,
   onEditSwatch = () => {},
   viewingSwatchId = null,
@@ -40,6 +79,7 @@ export default function BatchDetailsView({
   // Responsive state
   const [isMobile, setIsMobile] = useState(false);
   const [mobileEditingSwatchId, setMobileEditingSwatchId] = useState(null);
+  const [deletingSwatchId, setDeletingSwatchId] = useState(null);
 
   useEffect(() => {
     setMobileEditingSwatchId(null);
@@ -74,6 +114,19 @@ export default function BatchDetailsView({
   // Print simulation states
   const [isPrinting, setIsPrinting] = useState(false);
 
+  // Pane simulated loading state for UI
+  const [isPaneLoading, setIsPaneLoading] = useState(true);
+
+  useEffect(() => {
+    if (batchId) {
+      setIsPaneLoading(true);
+      const timer = setTimeout(() => {
+        setIsPaneLoading(false);
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+  }, [batchId]);
+
   const viewingSwatch = resolvedSwatches.find(s => s.id === viewingSwatchId);
 
   useEffect(() => {
@@ -93,16 +146,30 @@ export default function BatchDetailsView({
   const handleEditNameSave = async (e) => {
     if (e) e.preventDefault();
     if (!newBatchName.trim()) return;
-    setIsSavingName(true);
-    try {
-      await saveBatch({ ...batch, name: newBatchName });
-      setIsEditingName(false);
-      setShowMobileModal(false);
-      await onRefresh();
-    } catch (err) {
-      console.error('[DETAILS] Name update failed:', err);
-    } finally {
-      setIsSavingName(false);
+    const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
+    if (isDesktop) {
+      setIsSavingName(true);
+      try {
+        await saveBatch({ ...batch, name: newBatchName });
+        await onRefresh(false, true);
+        setIsEditingName(false);
+      } catch (err) {
+        console.error('[DETAILS] Desktop name update failed:', err);
+      } finally {
+        setIsSavingName(false);
+      }
+    } else {
+      setIsSavingName(true);
+      try {
+        await saveBatch({ ...batch, name: newBatchName });
+        await onRefresh(true);
+        setIsEditingName(false);
+        setShowMobileModal(false);
+      } catch (err) {
+        console.error('[DETAILS] Name update failed:', err);
+      } finally {
+        setIsSavingName(false);
+      }
     }
   };
 
@@ -125,12 +192,21 @@ export default function BatchDetailsView({
 
   const handleSaveSwatchInline = async (swatchId, updatedData) => {
     await saveSwatch(updatedData);
-    await onRefresh();
+    const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
+    await onRefresh(!isDesktop);
   };
 
   const handleDeleteSwatchInline = async (swatchId) => {
-    await deleteSwatch(swatchId);
-    await onRefresh();
+    setDeletingSwatchId(swatchId);
+    try {
+      await deleteSwatch(swatchId);
+      const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
+      await onRefresh(!isDesktop);
+    } catch (err) {
+      console.error('[BATCH] Delete swatch inline failed:', err);
+    } finally {
+      setDeletingSwatchId(null);
+    }
   };
 
   return (
@@ -143,6 +219,7 @@ export default function BatchDetailsView({
         newBatchName={newBatchName}
         setNewBatchName={setNewBatchName}
         isSavingName={isSavingName}
+        isSavingBulk={isSavingBulk}
         handleEditNameSave={handleEditNameSave}
         isEditingAnySwatchOnMobile={isEditingAnySwatchOnMobile}
         setShowMobileModal={setShowMobileModal}
@@ -156,10 +233,26 @@ export default function BatchDetailsView({
         onClose={onClose}
         resolvedSwatches={resolvedSwatches}
         selectedSwatchIds={selectedSwatchIds}
+        isPaneLoading={isPaneLoading}
       />
 
       <div className="flex-1 flex flex-col md:flex-row overflow-y-visible md:overflow-hidden min-h-0 relative">
-        {viewingSwatch ? (
+        {isPaneLoading ? (
+          <div className="flex-1 overflow-y-visible md:overflow-y-auto p-3">
+            <div 
+              className="grid justify-between gap-3"
+              style={{ gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(180px, 200px))' }}
+            >
+              {Array.from({ length: Math.max(resolvedSwatches.length || 6, 4) }).map((_, idx) => (
+                isMobile ? (
+                  <EnquirySkeletonCard key={idx} />
+                ) : (
+                  <BatchSwatchSkeletonCard key={idx} />
+                )
+              ))}
+            </div>
+          </div>
+        ) : viewingSwatch ? (
           <div className="flex-1 flex flex-col items-center justify-center p-6 bg-slate-100 relative overflow-hidden">
             <button
               onClick={() => setViewingSwatchId(null)}
@@ -243,6 +336,10 @@ export default function BatchDetailsView({
                     onMobileEditStateChange={(swatchId, isEditing) => {
                       setMobileEditingSwatchId(isEditing ? swatchId : null);
                     }}
+                    isSavingBulk={isSavingBulk}
+                    isSavingSingle={isSavingSingle}
+                    isDeletingBulk={isDeletingBulk}
+                    isDeletingSingle={deletingSwatchId === swatch.id || isDeletingSingle}
                   />
                 ))}
               </div>

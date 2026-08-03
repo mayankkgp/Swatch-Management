@@ -17,7 +17,8 @@ export default function DesktopInputTray({
   viewerTheme,
   setViewerTheme,
   selectClass,
-  inputClass
+  inputClass,
+  isNextLoading = false
 }) {
   const textareaRef = useRef(null);
 
@@ -32,6 +33,66 @@ export default function DesktopInputTray({
   const textareaClass = inputClass
     .replace('md:h-8', 'md:min-h-[32px] md:max-h-[62px]')
     .replace('md:py-0', 'md:py-1.5') + " resize-none overflow-y-auto";
+
+  const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
+
+  if (isNextLoading && isDesktop) {
+    return (
+      <div className="hidden md:flex md:w-[210px] flex-col bg-slate-50 relative border-r border-slate-200 overflow-y-auto shrink-0 select-none">
+        <div className="py-3 px-1.5 space-y-3.5 flex-1 bg-transparent">
+          <div className="flex items-center justify-between md:h-10 md:border-b md:border-slate-200 md:bg-slate-50 md:px-3 md:-mx-1.5 md:-mt-3 md:mb-3 md:shrink-0">
+            <div className="flex items-center gap-2">
+              <div className="size-3 rounded-full border border-indigo-500/30 border-t-indigo-600 animate-spin" />
+              <h2 className="text-xs font-mono font-bold uppercase text-slate-700 leading-tight">
+                Attributes
+              </h2>
+            </div>
+            <span className="text-[9px] uppercase font-bold font-mono text-indigo-600 bg-indigo-50/80 px-1.5 py-0.5 rounded border border-indigo-200/60 animate-pulse">
+              Loading
+            </span>
+          </div>
+
+          <div className="space-y-3 px-1.5 animate-pulse">
+            <div>
+              <div className="h-2.5 w-20 bg-slate-200/90 rounded mb-1.5" />
+              <div className="h-8 w-full bg-slate-200/70 rounded border border-slate-200/60" />
+            </div>
+
+            <div>
+              <div className="h-2.5 w-16 bg-slate-200/90 rounded mb-1.5" />
+              <div className="h-8 w-full bg-slate-200/70 rounded border border-slate-200/60" />
+            </div>
+
+            <div className="grid grid-cols-2 gap-1.5">
+              <div>
+                <div className="h-2.5 w-12 bg-slate-200/90 rounded mb-1.5" />
+                <div className="h-8 w-full bg-slate-200/70 rounded border border-slate-200/60" />
+              </div>
+              <div>
+                <div className="h-2.5 w-8 bg-slate-200/90 rounded mb-1.5" />
+                <div className="h-8 w-full bg-slate-200/70 rounded border border-slate-200/60" />
+              </div>
+            </div>
+
+            <div>
+              <div className="h-2.5 w-16 bg-slate-200/90 rounded mb-1.5" />
+              <div className="h-8 w-full bg-slate-200/70 rounded border border-slate-200/60" />
+            </div>
+
+            <div>
+              <div className="h-2.5 w-14 bg-slate-200/90 rounded mb-1.5" />
+              <div className="h-10 w-full bg-slate-200/70 rounded border border-slate-200/60" />
+            </div>
+
+            <div className="pt-1 flex items-center gap-2">
+              <div className="size-4 rounded bg-slate-200/90" />
+              <div className="h-2.5 w-28 bg-slate-200/90 rounded" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="hidden md:flex md:w-[210px] flex-col bg-slate-50 relative border-r border-slate-200 overflow-y-auto shrink-0 select-none">

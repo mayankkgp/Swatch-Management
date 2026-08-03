@@ -8,18 +8,18 @@ import { BATCHES_KEY, RECORDS_KEY, ACTIVE_DEFAULTS_KEY, getLocal, setLocal } fro
 
 export { hydrateAndSeedStorage } from './hydrationServices.js';
 
-export async function fetchBatches() {
-  await simulateNetwork();
+export async function fetchBatches(skipNetwork = false) {
+  if (!skipNetwork) await simulateNetwork();
   return getLocal(BATCHES_KEY) || [];
 }
 
-export async function fetchSwatches() {
-  await simulateNetwork();
+export async function fetchSwatches(skipNetwork = false) {
+  if (!skipNetwork) await simulateNetwork();
   return getLocal(RECORDS_KEY) || [];
 }
 
-export async function saveBatch(batchData) {
-  await simulateNetwork();
+export async function saveBatch(batchData, skipNetwork = false) {
+  if (!skipNetwork) await simulateNetwork();
   const currentBatches = getLocal(BATCHES_KEY) || [];
   const existsIndex = currentBatches.findIndex((b) => b.id === batchData.id);
   

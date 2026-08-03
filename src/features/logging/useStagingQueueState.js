@@ -7,12 +7,23 @@ import { useState, useEffect } from 'react';
 import MOCK_SWATCHES from '../../data/mock-swatch.json';
 
 export default function useStagingQueueState({
-  batchName,
+  stagedSwatches = [],
+  batchName = '',
   setBatchName,
   onSaveBatch,
-  isSavingBatch
+  onDeleteSwatch,
+  isSavingBatch = false
 }) {
-  const [reviewSwatches, setReviewSwatches] = useState(MOCK_SWATCHES.slice(0, 20));
+  const [reviewSwatches, setReviewSwatches] = useState(() => 
+    stagedSwatches && stagedSwatches.length > 0 ? stagedSwatches : MOCK_SWATCHES.slice(0, 20)
+  );
+
+  useEffect(() => {
+    if (stagedSwatches && stagedSwatches.length > 0) {
+      setReviewSwatches(stagedSwatches);
+    }
+  }, [stagedSwatches]);
+
   const [isBulkEditMode, setIsBulkEditMode] = useState(false);
   const [selectedSwatchIds, setSelectedSwatchIds] = useState([]);
   const [editingSwatchId, setEditingSwatchId] = useState(null);
@@ -22,6 +33,9 @@ export default function useStagingQueueState({
   const [pendingAction, setPendingAction] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
   const [isSavingBulk, setIsSavingBulk] = useState(false);
+  const [isSavingSingle, setIsSavingSingle] = useState(false);
+  const [isDeletingBulk, setIsDeletingBulk] = useState(false);
+  const [isDeletingSingle, setIsDeletingSingle] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
 
   useEffect(() => {
@@ -48,18 +62,30 @@ export default function useStagingQueueState({
   };
 
   const handleSaveSwatchInline = async (swatchId, updatedData) => {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    if (isMobile) {
+      await new Promise(res => setTimeout(res, 500));
+    }
     setReviewSwatches(prev => prev.map(s => s.id === swatchId ? { ...s, ...updatedData } : s));
     setEditingSwatchId(null);
   };
 
   const handleDeleteSwatchInline = async (swatchId) => {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    if (isMobile) {
+      await new Promise(res => setTimeout(res, 500));
+    }
     setReviewSwatches(prev => prev.filter(s => s.id !== swatchId));
     if (editingSwatchId === swatchId) setEditingSwatchId(null);
+    if (onDeleteSwatch) {
+      await onDeleteSwatch(swatchId);
+    }
   };
 
   const handleSaveSingle = async (modifiedFields) => {
-    setIsSavingBulk(true);
+    setIsSavingSingle(true);
     try {
+      await new Promise(res => setTimeout(res, 500));
       const swatchToUpdate = reviewSwatches.find(s => s.id === editingSwatchId);
       if (swatchToUpdate) {
         setReviewSwatches(prev => prev.map(s => s.id === editingSwatchId ? { ...s, ...modifiedFields } : s));
@@ -67,24 +93,26 @@ export default function useStagingQueueState({
       setEditingSwatchId(null);
       setViewingSwatchId(null);
     } finally {
-      setIsSavingBulk(false);
+      setIsSavingSingle(false);
     }
   };
 
   const handleDeleteSingle = async () => {
-    setIsSavingBulk(true);
+    setIsDeletingSingle(true);
     try {
+      await new Promise(res => setTimeout(res, 500));
       setReviewSwatches(prev => prev.filter(s => s.id !== editingSwatchId));
       setEditingSwatchId(null);
       setViewingSwatchId(null);
     } finally {
-      setIsSavingBulk(false);
+      setIsDeletingSingle(false);
     }
   };
 
   const handleSaveBulk = async (modifiedFields) => {
     setIsSavingBulk(true);
     try {
+      await new Promise(res => setTimeout(res, 500));
       setReviewSwatches(prev => prev.map(s => selectedSwatchIds.includes(s.id) ? { ...s, ...modifiedFields } : s));
       setIsBulkEditMode(false);
       setSelectedSwatchIds([]);
@@ -94,20 +122,23 @@ export default function useStagingQueueState({
   };
 
   const handleDeleteBulk = async () => {
-    setIsSavingBulk(true);
+    setIsDeletingBulk(true);
     try {
+      await new Promise(res => setTimeout(res, 500));
       setReviewSwatches(prev => prev.filter(s => !selectedSwatchIds.includes(s.id)));
       setIsBulkEditMode(false);
       setSelectedSwatchIds([]);
     } finally {
-      setIsSavingBulk(false);
+      setIsDeletingBulk(false);
     }
   };
 
   const handleSaveAndPrint = async () => {
     if (isSaveDisabled) return;
     setIsPrinting(true);
-    await onSaveBatch(batchName);
+    if (onSaveBatch) {
+      await onSaveBatch(batchName, reviewSwatches);
+    }
     await new Promise(resolve => setTimeout(resolve, 1500));
     setIsPrinting(false);
     alert(`Print job for batch "${batchName}" sent to queue!`);
@@ -118,8 +149,8 @@ export default function useStagingQueueState({
     if (!batchName.trim()) return;
     if (pendingAction === 'print') {
       await handleSaveAndPrint();
-    } else {
-      await onSaveBatch(batchName);
+    } else if (onSaveBatch) {
+      await onSaveBatch(batchName, reviewSwatches);
     }
     setShowMobileModal(false);
     setPendingAction(null);
@@ -144,6 +175,9 @@ export default function useStagingQueueState({
     setPendingAction,
     isMobile,
     isSavingBulk,
+    isSavingSingle,
+    isDeletingBulk,
+    isDeletingSingle,
     isPrinting,
     isEditingAnySwatchOnMobile,
     isDesktopActionDisabled,

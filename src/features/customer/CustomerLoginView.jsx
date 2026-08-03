@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Check } from 'lucide-react';
+import { X, Check, LogOut } from 'lucide-react';
 import CustomerEnquiryStackView from './CustomerEnquiryStackView';
 import PhoneEntryForm from './PhoneEntryForm';
 import OtpEntryForm from './OtpEntryForm';
@@ -63,6 +63,8 @@ export default function CustomerLoginView() {
   const [isEditingPhone, setIsEditingPhone] = useState(false);
   const [isResendingOtp, setIsResendingOtp] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [showLogoutConfirmModal, setShowLogoutConfirmModal] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const phoneInputRef = useRef(null);
   const otpInputRef = useRef(null);
@@ -72,6 +74,14 @@ export default function CustomerLoginView() {
     setStep('phone');
     setPhoneNumber('');
     setOtp('');
+
+    const handleLogoutEvent = () => {
+      setShowLogoutConfirmModal(true);
+    };
+    window.addEventListener('trigger-customer-logout', handleLogoutEvent);
+    return () => {
+      window.removeEventListener('trigger-customer-logout', handleLogoutEvent);
+    };
   }, []);
 
   // Focus phone input on mount
@@ -241,6 +251,22 @@ export default function CustomerLoginView() {
     }
   };
 
+  const handleConfirmLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    try {
+      await clearCustomerSession();
+      setStep('phone');
+      setPhoneNumber('');
+      setOtp('');
+      setShowLogoutConfirmModal(false);
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
   const filteredCountries = COUNTRY_CODES.filter(
     (c) =>
       c.country.toLowerCase().includes(countrySearchQuery.toLowerCase()) ||
@@ -250,14 +276,81 @@ export default function CustomerLoginView() {
 
   if (step === 'enquiry_stack') {
     return (
-      <CustomerEnquiryStackView
-        onLogout={async () => {
-          await clearCustomerSession();
-          setStep('phone');
-          setPhoneNumber('');
-          setOtp('');
-        }}
-      />
+      <>
+        <CustomerEnquiryStackView
+          onLogout={() => setShowLogoutConfirmModal(true)}
+        />
+
+        {/* Elegant Logout Confirmation Modal */}
+        <AnimatePresence>
+          {showLogoutConfirmModal && (
+            <div
+              onClick={() => !isLoggingOut && setShowLogoutConfirmModal(false)}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs select-none"
+            >
+              <motion.div
+                onClick={(e) => e.stopPropagation()}
+                initial={{ opacity: 0, scale: 0.95, y: 12 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 12 }}
+                transition={{ duration: 0.18, ease: 'easeOut' }}
+                className="bg-white rounded-2xl p-5 max-w-xs w-full shadow-2xl border border-slate-100 flex flex-col items-center text-center relative overflow-hidden"
+              >
+                {/* Top Close Button */}
+                <button
+                  type="button"
+                  onClick={() => setShowLogoutConfirmModal(false)}
+                  disabled={isLoggingOut}
+                  className="absolute top-3.5 right-3.5 p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors cursor-pointer"
+                  aria-label="Close modal"
+                >
+                  <X className="size-4" />
+                </button>
+
+                {/* Logout Icon Badge */}
+                <div className="size-12 rounded-full bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 mb-3.5 shadow-2xs">
+                  <LogOut className="size-6 ml-0.5" />
+                </div>
+
+                {/* Header & Body */}
+                <h3 className="text-base font-bold text-slate-900 tracking-tight mb-1">
+                  Log Out
+                </h3>
+                <p className="text-xs text-slate-500 leading-relaxed mb-5 px-1">
+                  Are you sure that you want to logout?
+                </p>
+
+                {/* Action Buttons */}
+                <div className="flex items-center gap-2.5 w-full">
+                  <button
+                    type="button"
+                    disabled={isLoggingOut}
+                    onClick={() => setShowLogoutConfirmModal(false)}
+                    className="flex-1 py-2.5 px-3 rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isLoggingOut}
+                    onClick={handleConfirmLogout}
+                    className="flex-1 py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs shadow-sm transition-colors flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-75"
+                  >
+                    {isLoggingOut ? (
+                      <>
+                        <span className="size-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <span>Logging Out...</span>
+                      </>
+                    ) : (
+                      <span>Log Out</span>
+                    )}
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+      </>
     );
   }
 

@@ -436,6 +436,7 @@ export default function EnquiriesDashboard() {
         {selectedEnquiryId && (
           <div className="flex-1 h-full overflow-hidden bg-slate-50">
             <EnquiryDetailsView
+              key={selectedEnquiryId}
               enquiry={selectedEnquiry}
               onClose={() => setSelectedEnquiryId(null)}
               onUpdateEnquiry={handleUpdateEnquiry}

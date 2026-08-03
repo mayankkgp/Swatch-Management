@@ -47,7 +47,7 @@ export default function AppWorkspace({
         <CustomerLoginView />
       ) : (
         <>
-          {refreshing && (
+          {refreshing && !(userRole === 'fabrito' && typeof window !== 'undefined' && window.innerWidth < 768) && (
             <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-50 flex items-center justify-center">
               <div className="bg-white px-4 py-2.5 rounded shadow border border-slate-200 flex items-center gap-2 text-xs font-mono text-slate-600">
                 <span className="size-3 border-2 border-slate-300 border-t-slate-800 rounded-full animate-spin" />
@@ -59,7 +59,10 @@ export default function AppWorkspace({
             <BatchDirectory 
               batches={batches} 
               swatches={swatches}
-              onRefresh={() => refreshData(true)}
+              onRefresh={(showSpinner, skipNetwork) => {
+                const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
+                refreshData(showSpinner !== undefined ? showSpinner : !isDesktop, skipNetwork);
+              }}
               onNavigate={handleNavigate}
               onResumeDraft={(batchId) => {
                 setResumeBatchId(batchId);
@@ -71,7 +74,10 @@ export default function AppWorkspace({
             <AllSwatchesStream 
               batches={batches} 
               swatches={swatches}
-              onRefresh={() => refreshData(true)}
+              onRefresh={(showSpinner, skipNetwork) => {
+                const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
+                refreshData(showSpinner !== undefined ? showSpinner : !isDesktop, skipNetwork);
+              }}
               onNavigate={handleNavigate}
             />
           )}
@@ -82,7 +88,10 @@ export default function AppWorkspace({
               activeDefaults={activeDefaults} 
               resumeBatchId={resumeBatchId}
               onClearResumeBatchId={() => setResumeBatchId(null)}
-              onRefresh={() => refreshData(true)}
+              onRefresh={(showSpinner, skipNetwork) => {
+                const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
+                refreshData(showSpinner !== undefined ? showSpinner : !isDesktop, skipNetwork);
+              }}
               onNavigate={handleNavigate}
               viewerTheme={viewerTheme}
               setViewerTheme={setViewerTheme}

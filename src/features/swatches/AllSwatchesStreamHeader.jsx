@@ -32,10 +32,17 @@ export default function AllSwatchesStreamHeader({
   setFromDate,
   toDate = '',
   setToDate,
-  resetFilters
+  resetFilters,
+  isSavingSingle = false,
+  isDeletingBulk = false
 }) {
   const [isPrinting, setIsPrinting] = useState(false);
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 768 : false);
+
+  const activeFilterCount = (structureFilter !== 'all' ? 1 : 0) +
+    (selectedVendors && selectedVendors.length > 0 ? 1 : 0) +
+    (fromDate || toDate ? 1 : 0);
+  const hasActiveFilters = activeFilterCount > 0;
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -44,7 +51,7 @@ export default function AllSwatchesStreamHeader({
   }, []);
 
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between gap-2.5 md:gap-3 p-1.5 md:h-10 md:py-0 md:px-3 bg-white border-b border-slate-200/80 shadow-xs shrink-0">
+    <div className="flex flex-col md:flex-row md:items-center justify-between gap-2.5 md:gap-3 p-1.5 md:h-10 md:py-0 md:px-3 bg-white border-b border-slate-200/80 shadow-xs shrink-0 relative">
       {/* Left Hand: Search & Filter Trigger */}
       <div className="flex items-center gap-3 md:gap-2 flex-1 w-full md:max-w-xl">
         {/* Search box with legibility bounds */}
@@ -79,7 +86,7 @@ export default function AllSwatchesStreamHeader({
               setShowSortBar(false); // Close sort bar when opening filter bar
             }}
             className={`h-10 w-10 md:h-6 md:w-auto text-base md:text-xs rounded md:rounded-sm border transition-colors flex items-center justify-center gap-2 md:gap-1.5 font-medium cursor-pointer shrink-0 relative md:py-0 md:px-2 ${
-              showFilterBar || structureFilter !== 'all' || (selectedVendors && selectedVendors.length > 0) || fromDate || toDate
+              showFilterBar || hasActiveFilters
                 ? 'bg-slate-900 text-white border-slate-900' 
                 : 'bg-transparent md:bg-white hover:bg-slate-50 text-slate-700 border-slate-200 md:shadow-2xs'
             }`}
@@ -110,17 +117,19 @@ export default function AllSwatchesStreamHeader({
             setShowFilterBar(prev => !prev);
             setShowSortBar(false);
           }}
-          className={`md:hidden h-10 w-10 text-base rounded border transition-colors flex items-center justify-center gap-2 font-medium cursor-pointer shrink-0 relative ${
-            showFilterBar || structureFilter !== 'all'
-              ? 'bg-slate-900 text-white border-slate-900' 
-              : 'bg-transparent hover:bg-slate-50 text-slate-700 border-slate-200'
+          className={`md:hidden h-10 w-10 text-base rounded border transition-all duration-200 flex items-center justify-center gap-2 font-medium cursor-pointer shrink-0 relative ${
+            showFilterBar
+              ? 'bg-slate-900 text-white border-slate-900 shadow-xs' 
+              : hasActiveFilters
+                ? 'bg-indigo-50/90 border-indigo-300/90 text-indigo-700 shadow-2xs hover:bg-indigo-100/90'
+                : 'bg-transparent hover:bg-slate-50 text-slate-700 border-slate-200'
           }`}
         >
-          <Filter className="size-5" />
-          {structureFilter !== 'all' && (
-            <Badge className="absolute -top-1 -right-1 bg-emerald-500 text-white text-[9px] size-4 rounded-full flex items-center justify-center font-bold pointer-events-none">
-              !
-            </Badge>
+          <Filter className={`size-5 ${hasActiveFilters && !showFilterBar ? 'text-indigo-600' : ''}`} />
+          {hasActiveFilters && (
+            <span className="absolute -top-1 -right-1 bg-indigo-600 text-white text-[10px] font-bold min-w-4 h-4 px-1 rounded-full flex items-center justify-center ring-2 ring-white shadow-xs pointer-events-none">
+              {activeFilterCount}
+            </span>
           )}
         </Button>
 
@@ -151,6 +160,12 @@ export default function AllSwatchesStreamHeader({
 
       {/* Right Hand: CTAs */}
       <div className="hidden md:flex items-center shrink-0">
+        {(isSavingSingle || isDeletingBulk) && (
+          <div className="hidden md:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-200/80 text-indigo-700 text-[11px] font-mono font-medium animate-in fade-in duration-200 shrink-0 mr-2 shadow-2xs">
+            <span className="size-2.5 border-2 border-indigo-200 border-t-indigo-600 rounded-full animate-spin shrink-0" />
+            <span>Saving changes...</span>
+          </div>
+        )}
         {!editingSwatchId && (
             isBulkEditMode ? (
               <Button

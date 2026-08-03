@@ -137,6 +137,19 @@ export default function Header({ activeModule, onNavigate, viewerTheme, setViewe
                 )}
               </>
             )}
+            {userRole === 'customer' && (getModuleTitle() === 'Enquiry Stack' || getModuleTitle() === 'Enquiry Submitted') && (
+              <button
+                id="customer-mobile-logout-btn"
+                onClick={() => {
+                  window.dispatchEvent(new CustomEvent('trigger-customer-logout'));
+                }}
+                className="p-1.5 -mr-1 rounded-md text-slate-700 hover:bg-slate-100 hover:text-rose-600 transition-colors cursor-pointer flex items-center justify-center"
+                title="Log Out"
+                aria-label="Log Out"
+              >
+                <LogOut className="size-5" />
+              </button>
+            )}
           </div>
         </div>
       </header>

@@ -25,13 +25,19 @@ export default function CaptureSession(props) {
     batchName,
     setBatchName,
     isSaving,
+    isDeleting,
     isSavingBatch,
+    isImageLoading,
+    isSidebarLoading,
+    isNextLoading,
     stagedSwatches,
     handleClearForm,
     handleSaveNext,
+    handleDeleteImage,
     handleDeleteStagedSwatch,
     handleFinalSaveBatch,
     handleImagesQueued,
+    handleActiveImageSet,
     viewerTheme,
     setViewerTheme,
     imageQueue
@@ -40,16 +46,18 @@ export default function CaptureSession(props) {
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden relative">
       <div className={`flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden ${showStagingQueue ? 'hidden md:flex' : 'flex'}`}>
-                <CaptureZone 
+        <CaptureZone 
           activeImage={activeImage}
           setActiveImage={setActiveImage}
           rotation={rotation}
           setRotation={setRotation}
+          onActiveImageSet={handleActiveImageSet}
           onImagesQueued={handleImagesQueued}
           aspectRatio={formData.aspectRatio}
           viewerTheme={viewerTheme}
           formData={formData}
           handleInputChange={handleInputChange}
+          isNextLoading={isImageLoading}
         />
         
         <InputTray 
@@ -60,6 +68,7 @@ export default function CaptureSession(props) {
           onClear={handleClearForm}
           viewerTheme={viewerTheme}
           setViewerTheme={setViewerTheme}
+          isNextLoading={isSidebarLoading}
         />
       </div>
 
@@ -69,9 +78,11 @@ export default function CaptureSession(props) {
           queueCount={imageQueue.length}
           onReviewClick={() => setShowStagingQueue(true)}
           onSaveNextClick={handleSaveNext}
-          isSaveDisabled={!activeImage}
+          isSaveDisabled={!activeImage || isImageLoading || isSidebarLoading || isSaving || isDeleting}
           isSaving={isSaving}
-          onClearImage={() => setActiveImage(null)}
+          isDeleting={isDeleting}
+          isNextLoading={isImageLoading || isSidebarLoading}
+          onClearImage={handleDeleteImage}
           hasActiveImage={!!activeImage}
           onRotate={() => setRotation((prev) => (prev + 90) % 360)}
         />

@@ -393,6 +393,7 @@ export default function EnquiryDetailsView({
         onUpdateEnquiry={onUpdateEnquiry}
         onClose={onClose}
         isViewingSwatch={Boolean(viewingSwatch)}
+        isPaneLoading={isPaneLoading}
       />
 
       {/* Body */}

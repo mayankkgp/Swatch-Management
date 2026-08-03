@@ -16,6 +16,7 @@ export default function BatchDetailsViewHeader({
   newBatchName,
   setNewBatchName,
   isSavingName,
+  isSavingBulk = false,
   handleEditNameSave,
   isEditingAnySwatchOnMobile,
   setShowMobileModal,
@@ -28,8 +29,38 @@ export default function BatchDetailsViewHeader({
   isPrinting,
   onClose,
   resolvedSwatches = [],
-  selectedSwatchIds = []
+  selectedSwatchIds = [],
+  isPaneLoading = false
 }) {
+  if (isPaneLoading) {
+    return (
+      <div className="sticky top-0 md:relative z-30 bg-white border-b border-slate-200 p-3 flex items-center justify-between shadow-xs md:h-10 md:py-0 shrink-0 select-none">
+        <div className="flex items-center gap-1.5 min-w-0 flex-1">
+          <div className="flex flex-col md:flex-row md:items-center md:gap-x-3 gap-y-1 w-full min-w-0">
+            <div className="flex items-center gap-1.5">
+              <div className="h-4 bg-slate-200 rounded-md w-32 sm:w-44 md:w-48 animate-pulse shrink-0" />
+              <div className="h-3.5 w-3.5 bg-slate-200/60 rounded-xs animate-pulse shrink-0 hidden md:block" />
+            </div>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <div className="h-3 bg-slate-200/70 rounded-xs w-16 animate-pulse" />
+              <span className="text-slate-300 font-sans text-[10px]">•</span>
+              <div className="h-3 bg-slate-200/60 rounded-xs w-14 animate-pulse" />
+              <span className="text-slate-300 font-sans text-[10px]">•</span>
+              <div className="h-3 bg-slate-200/60 rounded-xs w-12 animate-pulse" />
+            </div>
+          </div>
+        </div>
+        <div className="size-8 bg-indigo-100/70 rounded-md animate-pulse md:hidden shrink-0" />
+        <div className="hidden md:flex items-center shrink-0 gap-2">
+          <div className="h-6 w-20 bg-slate-200/70 rounded-xs animate-pulse" />
+          <div className="h-6 w-14 bg-indigo-200/60 rounded-xs animate-pulse" />
+          <div className="w-2" />
+          <div className="size-6 bg-slate-200/50 rounded-xs animate-pulse" />
+        </div>
+      </div>
+    );
+  }
+
   const isAllSelected = resolvedSwatches.length > 0 && selectedSwatchIds.length === resolvedSwatches.length;
 
   const handleToggleAll = () => {
@@ -52,16 +83,17 @@ export default function BatchDetailsViewHeader({
                     type="text"
                     value={newBatchName}
                     onChange={(e) => setNewBatchName(e.target.value)}
-                    className="px-2.5 md:px-2 font-bold text-base md:text-sm text-slate-900 border border-slate-300 rounded-md md:rounded-sm focus:border-slate-500 w-32 sm:w-44 md:w-56 h-8 md:h-6 py-1 px-1 md:py-0 md:px-2"
+                    className="px-2.5 md:px-2 font-bold text-base md:text-sm text-slate-900 border border-slate-300 focus:border-slate-500 rounded-md md:rounded-sm w-32 sm:w-44 md:w-56 h-8 md:h-6 py-1 px-1 md:py-0 md:px-2"
                     disabled={isSavingName}
                   />
                   <Button 
                     type="submit" 
                     disabled={isSavingName}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-md md:rounded-sm flex items-center justify-center shrink-0 h-8 w-8 md:h-6 md:w-6 p-0"
+                    title={isSavingName ? "Saving name..." : "Confirm name"}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-md md:rounded-sm flex items-center justify-center shrink-0 h-8 w-8 md:h-6 md:w-6 p-0 transition-all duration-150 disabled:opacity-80"
                   >
                     {isSavingName ? (
-                      <span className="size-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span className="size-3 md:size-2.5 border-2 border-white/40 border-t-white rounded-full animate-spin shrink-0" />
                     ) : (
                       <Check className="size-4 md:size-3" />
                     )}
@@ -69,7 +101,8 @@ export default function BatchDetailsViewHeader({
                   <Button 
                     type="button" 
                     onClick={() => setIsEditingName(false)}
-                    className="bg-slate-100 hover:bg-slate-200 text-slate-500 border border-slate-200 rounded-md md:rounded-sm flex items-center justify-center shrink-0 h-8 w-8 md:h-6 md:w-6 p-0"
+                    disabled={isSavingName}
+                    className="bg-slate-100 hover:bg-slate-200 text-slate-500 border border-slate-200 rounded-md md:rounded-sm flex items-center justify-center shrink-0 h-8 w-8 md:h-6 md:w-6 p-0 disabled:opacity-40"
                   >
                     <X className="size-4 md:size-3" />
                   </Button>
@@ -109,6 +142,12 @@ export default function BatchDetailsViewHeader({
       </div>
 
       <div className="flex items-center shrink-0">
+        {isSavingBulk && (
+          <div className="hidden md:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-200/80 text-indigo-700 text-[11px] font-mono font-medium animate-in fade-in duration-200 shrink-0 mr-2 shadow-2xs">
+            <span className="size-2.5 border-2 border-indigo-200 border-t-indigo-600 rounded-full animate-spin shrink-0" />
+            <span>Saving changes...</span>
+          </div>
+        )}
         {!viewingSwatchId && !editingSwatchId && (
           <>
             {isBulkEditMode ? (

@@ -33,7 +33,12 @@ export default function AllSwatchesStreamGrid({
   totalPages,
   pageInput,
   handlePageInputChange,
-  handlePageInputBlur
+  handlePageInputBlur,
+  isSavingSingle = false,
+  isDeletingSingle = false,
+  deletingSwatchId = null,
+  isDeletingBulk = false,
+  isSavingBulk = false
 }) {
   return (
     <div className="flex-1 overflow-y-auto p-3 relative">
@@ -89,6 +94,10 @@ export default function AllSwatchesStreamGrid({
                   onMobileEditStateChange={(swatchId, isEditing) => {
                     setMobileEditingSwatchId(isEditing ? swatchId : null);
                   }}
+                  isSavingSingle={isSavingSingle}
+                  isDeletingSingle={deletingSwatchId === swatch.id || (isDeletingSingle && editingSwatchId === swatch.id)}
+                  isDeletingBulk={isDeletingBulk}
+                  isSavingBulk={isSavingBulk}
                 />
               );
             })}

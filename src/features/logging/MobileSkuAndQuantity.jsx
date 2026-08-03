@@ -8,9 +8,25 @@ import React from 'react';
 export default function MobileSkuAndQuantity({
   viewerTheme = 'dark',
   formData,
-  handleInputChange
+  handleInputChange,
+  isNextLoading = false
 }) {
   const isLight = viewerTheme === 'light';
+
+  if (isNextLoading) {
+    return (
+      <div className="w-full flex gap-2.5 mt-1.5 mb-2 shrink-0 px-1 animate-pulse">
+        <div className="flex-1 min-w-0 flex flex-col">
+          <div className={`h-3 w-16 rounded mb-1 ${isLight ? 'bg-slate-200' : 'bg-slate-700'}`} />
+          <div className={`w-full h-8 rounded-md ${isLight ? 'bg-slate-200/80' : 'bg-slate-800/80'}`} />
+        </div>
+        <div className="w-[105px] shrink-0 flex flex-col">
+          <div className={`h-3 w-12 rounded mb-1 ${isLight ? 'bg-slate-200' : 'bg-slate-700'}`} />
+          <div className={`w-full h-8 rounded-md ${isLight ? 'bg-slate-200/80' : 'bg-slate-800/80'}`} />
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="w-full flex gap-2.5 mt-1.5 mb-2 shrink-0 px-1">

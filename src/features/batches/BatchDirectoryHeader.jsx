@@ -37,6 +37,12 @@ export default function BatchDirectoryHeader({
 }) {
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 768 : false);
 
+  const activeFilterCount = (filterMinSwatches !== 'all' ? 1 : 0) +
+    (filterMonth !== 'all' ? 1 : 0) +
+    (selectedVendors && selectedVendors.length > 0 ? 1 : 0) +
+    (fromDate || toDate ? 1 : 0);
+  const hasActiveFilters = activeFilterCount > 0;
+
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener('resize', handleResize);
@@ -107,16 +113,18 @@ export default function BatchDirectoryHeader({
               id="filter-trigger-btn-compact"
               onClick={() => setShowFilterBar(prev => !prev)}
               className={`h-6 text-[10px] px-1.5 rounded-sm border transition-colors flex items-center justify-center gap-1 font-medium shrink-0 ${
-                showFilterBar || filterMinSwatches !== 'all' || filterMonth !== 'all' || (selectedVendors && selectedVendors.length > 0) || fromDate || toDate
+                showFilterBar
                   ? 'bg-slate-900 text-white border-slate-900' 
-                  : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
+                  : hasActiveFilters
+                    ? 'bg-indigo-50 border-indigo-300 text-indigo-700 shadow-2xs'
+                    : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
               }`}
               title="Toggle Filters"
             >
-              <Filter className="size-3" />
-              {(filterMinSwatches !== 'all' || filterMonth !== 'all' || (selectedVendors && selectedVendors.length > 0) || fromDate || toDate) && (
-                <span className="bg-emerald-500 text-white text-[8px] px-0.5 rounded-full font-bold leading-none md:hidden">
-                  !
+              <Filter className={`size-3 ${hasActiveFilters && !showFilterBar ? 'text-indigo-600' : ''}`} />
+              {hasActiveFilters && (
+                <span className="bg-indigo-600 text-white text-[8px] min-w-3.5 h-3.5 px-1 rounded-full font-bold flex items-center justify-center leading-none md:hidden">
+                  {activeFilterCount}
                 </span>
               )}
             </Button>
@@ -219,7 +227,7 @@ export default function BatchDirectoryHeader({
             id="filter-trigger-btn"
             onClick={() => setShowFilterBar(prev => !prev)}
             className={`h-10 w-10 md:h-6 md:w-auto text-base md:text-xs rounded md:rounded-sm border transition-colors flex items-center justify-center gap-2 md:gap-1.5 font-medium cursor-pointer shrink-0 relative md:py-0 md:px-2 ${
-              showFilterBar || filterMinSwatches !== 'all' || filterMonth !== 'all' || (selectedVendors && selectedVendors.length > 0) || fromDate || toDate
+              showFilterBar || hasActiveFilters
                 ? 'bg-slate-900 text-white border-slate-900' 
                 : 'bg-transparent md:bg-white hover:bg-slate-50 text-slate-700 border-slate-200 md:shadow-2xs'
             }`}
@@ -249,17 +257,19 @@ export default function BatchDirectoryHeader({
         <Button
           id="filter-trigger-btn-mobile"
           onClick={() => setShowFilterBar(prev => !prev)}
-          className={`md:hidden h-10 w-10 text-base rounded border transition-colors flex items-center justify-center gap-2 font-medium cursor-pointer shrink-0 relative ${
-            showFilterBar || filterMinSwatches !== 'all' || filterMonth !== 'all'
-              ? 'bg-slate-900 text-white border-slate-900' 
-              : 'bg-transparent hover:bg-slate-50 text-slate-700 border-slate-200'
+          className={`md:hidden h-10 w-10 text-base rounded border transition-all duration-200 flex items-center justify-center gap-2 font-medium cursor-pointer shrink-0 relative ${
+            showFilterBar
+              ? 'bg-slate-900 text-white border-slate-900 shadow-xs' 
+              : hasActiveFilters
+                ? 'bg-indigo-50/90 border-indigo-300/90 text-indigo-700 shadow-2xs hover:bg-indigo-100/90'
+                : 'bg-transparent hover:bg-slate-50 text-slate-700 border-slate-200'
           }`}
         >
-          <Filter className="size-5" />
-          {(filterMinSwatches !== 'all' || filterMonth !== 'all') && (
-            <Badge className="absolute -top-1 -right-1 bg-emerald-500 text-white text-[9px] size-4 rounded-full flex items-center justify-center font-bold pointer-events-none">
-              !
-            </Badge>
+          <Filter className={`size-5 ${hasActiveFilters && !showFilterBar ? 'text-indigo-600' : ''}`} />
+          {hasActiveFilters && (
+            <span className="absolute -top-1 -right-1 bg-indigo-600 text-white text-[10px] font-bold min-w-4 h-4 px-1 rounded-full flex items-center justify-center ring-2 ring-white shadow-xs pointer-events-none">
+              {activeFilterCount}
+            </span>
           )}
         </Button>
       </div>

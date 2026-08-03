@@ -3,11 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, ArrowLeft, Edit2, CheckSquare, Square } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import BulkEditPanel from '../batches/BulkEditPanel';
 import BatchDetailsViewRenameModal from '../batches/BatchDetailsViewRenameModal';
+import { BatchSwatchSkeletonCard } from '../batches/BatchDetailsView';
+import EnquirySkeletonCard from '../customer/EnquirySkeletonCard';
 import ViewingSwatchPreview from './ViewingSwatchPreview';
 import SwatchReviewGrid from './SwatchReviewGrid';
 import StagingExecutionBar from './StagingExecutionBar';
@@ -24,11 +26,24 @@ export default function StagingQueueOverlay({
   onRefresh
 }) {
   const state = useStagingQueueState({
+    stagedSwatches,
+    onRefresh,
+    onDeleteSwatch,
+    onSaveBatch,
     batchName,
     setBatchName,
-    onSaveBatch,
     isSavingBatch
   });
+
+  const [isPaneLoading, setIsPaneLoading] = useState(true);
+
+  useEffect(() => {
+    setIsPaneLoading(true);
+    const timer = setTimeout(() => {
+      setIsPaneLoading(false);
+    }, 450);
+    return () => clearTimeout(timer);
+  }, []);
 
   const showingSidebar = (state.isBulkEditMode || state.editingSwatchId || state.viewingSwatchId);
   const activeEditingOrViewingSwatch = state.reviewSwatches.find(s => s.id === (state.editingSwatchId || state.viewingSwatchId));
@@ -49,7 +64,7 @@ export default function StagingQueueOverlay({
               state.setSelectedSwatchIds([]);
             }}
             onDelete={state.isBulkEditMode ? state.handleDeleteBulk : state.handleDeleteSingle}
-            isSaving={state.isSavingBulk}
+            isSaving={state.isSavingBulk || state.isSavingSingle || state.isDeletingBulk || state.isDeletingSingle}
             onEdit={() => {
               state.setEditingSwatchId(state.viewingSwatchId);
               state.setViewingSwatchId(null);
@@ -81,6 +96,12 @@ export default function StagingQueueOverlay({
           </div>
 
           <div className="flex items-center gap-2">
+            {(state.isSavingBulk || state.isSavingSingle) && (
+              <div className="hidden md:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-200/80 text-indigo-700 text-[11px] font-mono font-medium animate-in fade-in duration-200 shrink-0 mr-2 shadow-2xs">
+                <span className="size-2.5 border-2 border-indigo-200 border-t-indigo-600 rounded-full animate-spin shrink-0" />
+                <span>Saving changes...</span>
+              </div>
+            )}
             {!state.viewingSwatchId && !state.editingSwatchId && (
               <>
                 {state.isBulkEditMode ? (
@@ -139,7 +160,22 @@ export default function StagingQueueOverlay({
         </div>
 
         <div className="flex-1 overflow-y-visible md:overflow-hidden min-h-0 relative flex flex-col">
-          {state.viewingSwatchId ? (
+          {isPaneLoading ? (
+            <div className="flex-1 overflow-y-auto p-4 md:p-3 bg-white md:bg-slate-50">
+              <div 
+                className="grid justify-between gap-3"
+                style={{ gridTemplateColumns: state.isMobile ? '1fr' : 'repeat(auto-fit, minmax(180px, 200px))' }}
+              >
+                {Array.from({ length: Math.max(state.reviewSwatches.length || 6, 4) }).map((_, idx) => (
+                  state.isMobile ? (
+                    <EnquirySkeletonCard key={idx} />
+                  ) : (
+                    <BatchSwatchSkeletonCard key={idx} />
+                  )
+                ))}
+              </div>
+            </div>
+          ) : state.viewingSwatchId ? (
             <ViewingSwatchPreview
               viewingSwatch={state.reviewSwatches.find(s => s.id === state.viewingSwatchId)}
               onClosePreview={() => state.setViewingSwatchId(null)}
@@ -160,6 +196,10 @@ export default function StagingQueueOverlay({
               setEditingSwatchId={state.setEditingSwatchId}
               setIsBulkEditMode={state.setIsBulkEditMode}
               setMobileEditingSwatchId={state.setMobileEditingSwatchId}
+              isSavingBulk={state.isSavingBulk}
+              isSavingSingle={state.isSavingSingle}
+              isDeletingBulk={state.isDeletingBulk}
+              isDeletingSingle={state.isDeletingSingle}
             />
           )}
         </div>
@@ -177,7 +217,11 @@ export default function StagingQueueOverlay({
           isPrinting={state.isPrinting}
           setPendingAction={state.setPendingAction}
           setShowMobileModal={state.setShowMobileModal}
-          onSaveBatch={onSaveBatch}
+          onSaveBatch={(name) => {
+            if (onSaveBatch) {
+              onSaveBatch(name, state.reviewSwatches);
+            }
+          }}
           handleSaveAndPrint={state.handleSaveAndPrint}
         />
         

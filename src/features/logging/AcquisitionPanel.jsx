@@ -6,7 +6,7 @@
 import React, { useRef } from 'react';
 import { Camera, Image as ImageIcon } from 'lucide-react';
 import Button from '../../components/ui/Button';
-import { INITIAL_SWATCHES } from '../../data/seedData';
+import INITIAL_SWATCHES_RAW from '../../data/mock-swatch.json';
 
 export default function AcquisitionPanel({ onActiveImageSet, onImagesQueued }) {
   const fileInputRef = useRef(null);
@@ -27,15 +27,12 @@ export default function AcquisitionPanel({ onActiveImageSet, onImagesQueued }) {
   };
 
   const handleDesktopImageUpload = (e) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length > 0) {
-      const mockImages = INITIAL_SWATCHES.slice(0, 5).map(swatch => ({
-        image: swatch.image,
-        aspectRatio: swatch.aspectRatio || '3:4'
-      }));
-      if (onImagesQueued) {
-        onImagesQueued(mockImages);
-      }
+    const mockImages = INITIAL_SWATCHES_RAW.slice(0, 5).map(swatch => ({
+      image: swatch.image,
+      aspectRatio: swatch.aspectRatio || '3:4'
+    }));
+    if (onImagesQueued) {
+      onImagesQueued(mockImages);
     }
     if (desktopFileInputRef.current) {
       desktopFileInputRef.current.value = '';
@@ -43,9 +40,9 @@ export default function AcquisitionPanel({ onActiveImageSet, onImagesQueued }) {
   };
 
   const handleMobileLoadMockImages = () => {
-    const mockImages = INITIAL_SWATCHES.slice(0, 5).map(swatch => ({
+    const mockImages = INITIAL_SWATCHES_RAW.slice(0, 5).map(swatch => ({
       image: swatch.image,
-      aspectRatio: '3:4'
+      aspectRatio: swatch.aspectRatio || '3:4'
     }));
     if (onImagesQueued) {
       onImagesQueued(mockImages);
