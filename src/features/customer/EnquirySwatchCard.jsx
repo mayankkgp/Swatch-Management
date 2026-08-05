@@ -23,6 +23,9 @@ export default function EnquirySwatchCard({
   const isDropdownOpen = dropdownOpenId === item.instanceId;
   const isLongPressing = longPressActiveId === item.instanceId;
 
+  const skuId = item.id || item.skuId || item.vendorSku;
+  const hasQuantity = item.quantity !== undefined && item.quantity !== null && item.quantity !== '';
+
   return (
     <motion.div
       key={item.instanceId}
@@ -89,23 +92,35 @@ export default function EnquirySwatchCard({
           <div className="flex flex-col justify-between h-full w-full min-w-0 text-left">
             <div className="space-y-1 text-slate-700 font-mono text-[12px] leading-snug min-w-0 w-full">
               {/* Row 1: SKU ID and Static Quantity */}
-              <div className="break-words w-full flex flex-wrap items-center gap-x-1 min-w-0">
-                <span className="text-slate-800 font-bold truncate max-w-full">{item.id || item.skuId || item.vendorSku || '-'}</span>
-                <span className="text-slate-300 font-sans font-normal shrink-0 mx-1">•</span>
-                <span className="text-slate-500 font-normal shrink-0">
-                  {item.quantity ? `${item.quantity}${item.unit || 'm'}` : '100m'}
-                </span>
-              </div>
+              {(skuId || hasQuantity) && (
+                <div className="break-words w-full flex flex-wrap items-center gap-x-1 min-w-0">
+                  {skuId && (
+                    <span className="text-slate-800 font-bold truncate max-w-full">{skuId}</span>
+                  )}
+                  {skuId && hasQuantity && (
+                    <span className="text-slate-300 font-sans font-normal shrink-0 mx-1">•</span>
+                  )}
+                  {hasQuantity && (
+                    <span className="text-slate-500 font-normal shrink-0">
+                      {`${item.quantity}${item.unit || 'm'}`}
+                    </span>
+                  )}
+                </div>
+              )}
 
               {/* Row 2: Structure */}
-              <div className="text-slate-500 break-words w-full min-w-0">
-                {item.structure || '-'}
-              </div>
+              {item.structure && (
+                <div className="text-slate-500 break-words w-full min-w-0">
+                  {item.structure}
+                </div>
+              )}
 
               {/* Row 3: Material Content */}
-              <div className="text-slate-500 break-words w-full min-w-0">
-                {item.content || '-'}
-              </div>
+              {item.content && (
+                <div className="text-slate-500 break-words w-full min-w-0">
+                  {item.content}
+                </div>
+              )}
             </div>
 
             {/* REQUIRED QTY input CTA */}

@@ -108,9 +108,18 @@ export async function addEnquiryItem(swatchToScan) {
   await simulateNetwork();
   const currentStack = getLocal(CUSTOMER_ENQUIRY_STACK_KEY) || [];
   const sourceSwatch = swatchToScan || INITIAL_SWATCHES_RAW[currentStack.length % INITIAL_SWATCHES_RAW.length];
+  
+  // Independent 60% probability for each of the 3 fields being absent (null)
+  const omitQuantity = Math.random() < 0.6;
+  const omitStructure = Math.random() < 0.6;
+  const omitContent = Math.random() < 0.6;
+
   const newItem = {
     instanceId: `enq-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
     ...sourceSwatch,
+    quantity: omitQuantity ? null : sourceSwatch.quantity,
+    structure: omitStructure ? null : sourceSwatch.structure,
+    content: omitContent ? null : sourceSwatch.content,
     qty: '',
     unit: sourceSwatch.unit || 'm'
   };
@@ -160,9 +169,16 @@ export async function startNewCustomerEnquiry() {
   removeLocal(CUSTOMER_ENQUIRY_SUBMITTED_KEY);
 
   const sourceSwatch = INITIAL_SWATCHES_RAW[0];
+  const omitQuantity = Math.random() < 0.6;
+  const omitStructure = Math.random() < 0.6;
+  const omitContent = Math.random() < 0.6;
+
   const newItem = {
     instanceId: `enq-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
     ...sourceSwatch,
+    quantity: omitQuantity ? null : sourceSwatch.quantity,
+    structure: omitStructure ? null : sourceSwatch.structure,
+    content: omitContent ? null : sourceSwatch.content,
     qty: '',
     unit: sourceSwatch.unit || 'm'
   };
