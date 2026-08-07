@@ -178,8 +178,16 @@ export default function CustomerEnquiryStackView({ onLogout }) {
     setLongPressActiveId(null);
   };
 
+  const pauseDeleteTimer = () => {
+    if (deleteIntervalRef.current) {
+      clearInterval(deleteIntervalRef.current);
+      deleteIntervalRef.current = null;
+    }
+  };
+
   // Delete item handler
   const handleDeleteItem = async (instanceId) => {
+    pauseDeleteTimer();
     try {
       const updatedStack = await deleteEnquiryItem(instanceId);
       setEnquiryItems(updatedStack);
@@ -188,6 +196,11 @@ export default function CustomerEnquiryStackView({ onLogout }) {
     } catch (err) {
       showToast('Failed to delete item', true);
     }
+  };
+
+  const handleCancelDelete = () => {
+    pauseDeleteTimer();
+    setDeleteConfirmId(null);
   };
 
   // Update item quantity
@@ -309,6 +322,8 @@ export default function CustomerEnquiryStackView({ onLogout }) {
                     handleTouchStart={handleTouchStart}
                     handleTouchEnd={handleTouchEnd}
                     handleDeleteItem={handleDeleteItem}
+                    handleCancelDelete={handleCancelDelete}
+                    pauseDeleteTimer={pauseDeleteTimer}
                     handleQtyChange={handleQtyChange}
                   />
                 ))}

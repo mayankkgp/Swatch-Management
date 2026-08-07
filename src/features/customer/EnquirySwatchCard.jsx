@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Loader2 } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import { getSwatchAspectRatio, getSwatchFallbackBackground, isRealImageSource } from '../batches/swatchCardUtils';
 
@@ -17,6 +17,8 @@ export default function EnquirySwatchCard({
   handleTouchStart,
   handleTouchEnd,
   handleDeleteItem,
+  handleCancelDelete,
+  pauseDeleteTimer,
   handleQtyChange,
 }) {
   const isDeleteConfirm = deleteConfirmId === item.instanceId;
@@ -25,6 +27,38 @@ export default function EnquirySwatchCard({
 
   const skuId = item.id || item.skuId || item.vendorSku;
   const hasQuantity = item.quantity !== undefined && item.quantity !== null && item.quantity !== '';
+
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isCanceling, setIsCanceling] = useState(false);
+
+  useEffect(() => {
+    if (!isDeleteConfirm) {
+      setIsDeleting(false);
+      setIsCanceling(false);
+    }
+  }, [isDeleteConfirm]);
+
+  const onClickDelete = async () => {
+    if (isDeleting || isCanceling) return;
+    if (pauseDeleteTimer) pauseDeleteTimer();
+    setIsDeleting(true);
+    await new Promise((res) => setTimeout(res, 500));
+    await handleDeleteItem(item.instanceId);
+    setIsDeleting(false);
+  };
+
+  const onClickCancel = async () => {
+    if (isDeleting || isCanceling) return;
+    if (pauseDeleteTimer) pauseDeleteTimer();
+    setIsCanceling(true);
+    await new Promise((res) => setTimeout(res, 500));
+    if (handleCancelDelete) {
+      handleCancelDelete();
+    } else {
+      setDeleteConfirmId(null);
+    }
+    setIsCanceling(false);
+  };
 
   return (
     <motion.div
@@ -206,7 +240,7 @@ export default function EnquirySwatchCard({
             {/* Progress bar */}
             <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden my-1">
               <div
-                className="bg-red-500 h-full transition-all duration-100 ease-linear"
+                className={`bg-red-500 h-full ${isDeleting || isCanceling ? 'transition-none' : 'transition-all duration-100 ease-linear'}`}
                 style={{ width: `${deleteProgress}%` }}
               />
             </div>
@@ -214,17 +248,33 @@ export default function EnquirySwatchCard({
             <div className="flex items-center gap-2 mt-auto pt-1">
               <Button
                 type="button"
-                onClick={() => handleDeleteItem(item.instanceId)}
-                className="flex-1 h-8 py-1 text-[10px] uppercase font-extrabold tracking-wider bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors cursor-pointer flex items-center justify-center"
+                onClick={onClickDelete}
+                disabled={isDeleting || isCanceling}
+                className="flex-1 h-8 py-1 text-[10px] uppercase font-extrabold tracking-wider bg-red-600 hover:bg-red-700 disabled:opacity-70 text-white rounded-md transition-colors cursor-pointer flex items-center justify-center gap-1.5"
               >
-                Delete
+                {isDeleting ? (
+                  <>
+                    <Loader2 className="size-3 animate-spin shrink-0" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <span>Delete</span>
+                )}
               </Button>
               <Button
                 type="button"
-                onClick={() => setDeleteConfirmId(null)}
-                className="flex-1 h-8 py-1 text-[10px] uppercase font-extrabold tracking-wider bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-md transition-colors cursor-pointer flex items-center justify-center"
+                onClick={onClickCancel}
+                disabled={isDeleting || isCanceling}
+                className="flex-1 h-8 py-1 text-[10px] uppercase font-extrabold tracking-wider bg-slate-800 hover:bg-slate-700 disabled:opacity-70 text-slate-200 rounded-md transition-colors cursor-pointer flex items-center justify-center gap-1.5"
               >
-                Cancel
+                {isCanceling ? (
+                  <>
+                    <Loader2 className="size-3 animate-spin shrink-0" />
+                    <span>Canceling...</span>
+                  </>
+                ) : (
+                  <span>Cancel</span>
+                )}
               </Button>
             </div>
           </motion.div>
